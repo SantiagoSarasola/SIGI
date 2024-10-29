@@ -1,18 +1,20 @@
 import express from "express";
 import cors from "cors";
+import { connectDB } from "./db";
+import routerProductos from "./inventario/productos";
+
+connectDB();
+console.log("Base de Datos conectada");
 
 const app = express();
 const PORT = 3000;
 
-// Interpretar JSON en el body.
 app.use(express.json());
 
-// Habilitamos CORS
 app.use(cors());
 
-app.get("/", (req, res) => {
-  res.send("Hola Grupo!");
-});
+// Conecta la ruta "productos" con el router
+app.use("/productos", routerProductos);
 
 app.listen(PORT, (err) => {
   console.log(
