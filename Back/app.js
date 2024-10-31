@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
-import { connectDB } from "./db";
-import routerProductos from "./inventario/productos";
+import { connectDB } from "./db.js";
+import routerProductos from "./inventario/productos.js";
 
 connectDB();
 console.log("Base de Datos conectada");
