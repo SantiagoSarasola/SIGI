@@ -21,7 +21,7 @@ router.put("/:id", validarId, validarAtributosProducto, async(req,res) => {
     const idCategoria = req.body.idCategoria;
     const idFabrica = req.body.idFabrica;
 
-    const sql = "CALL ModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const sql = "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     const [result] = await db.query(sql,[
         nombreProducto, stockActual, precioLista, descuentoUno, costoIntermedio, descuentoDos, costoFinal,

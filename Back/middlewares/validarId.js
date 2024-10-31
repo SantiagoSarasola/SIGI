@@ -4,16 +4,13 @@ const validarId = (req, res, next) => {
     const id = Number(req.params.id);
 
     if(isNaN(id)){
-        res.status(400).send({mensaje : "El id no es un número."});
-        return;
+        return res.status(400).send({mensaje : "El id no es un número."});
     }
     if(!Number.isInteger(id)){
-        res.status(400).send({mensaje : "El id no es un entero"});
-        return;
+        return res.status(400).send({mensaje : "El id no es un entero"});
     }
     if(id <= 0){
-        res.status(400).send({mensaje : "El id debe ser positivo."});
-        return;
+        return res.status(400).send({mensaje : "El id debe ser positivo."});
     }
 
     next();
