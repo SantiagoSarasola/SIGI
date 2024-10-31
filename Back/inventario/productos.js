@@ -5,6 +5,20 @@ import validarAtributosProducto from "../middlewares/validarAtributosProducto.js
 
 const router = express.Router();
 
+router.get("/", async (req, res) => {
+    const {
+      offset = 0,
+      limit = 10,
+      sort = "nombre_producto",
+      order = "ASC",
+    } = req.query;
+  
+    const sql = "CALL get_productos(?, ?, ?, ?)";
+    const [productos] = await db.execute(sql, [offset, limit, sort, order]);
+  
+    res.send({ productos });
+});
+
 router.put("/:id", validarId, validarAtributosProducto, async(req,res) => {
     const id = Number(req.params.id);
     const nombreProducto = req.body.nombreProducto;
@@ -27,13 +41,11 @@ router.put("/:id", validarId, validarAtributosProducto, async(req,res) => {
         nombreProducto, stockActual, precioLista, descuentoUno, costoIntermedio, descuentoDos, costoFinal,
         incremento, precioSugerido, precioFinal, ganancia,
         idCategoria, idFabrica, id]);
-    console.log(result);
     res.status(200).send({producto: {
         id, nombreProducto, stockActual, precioLista, descuentoUno, costoIntermedio, descuentoDos, costoFinal,
         incremento, precioSugerido, precioFinal, ganancia,
         idCategoria, idFabrica}
     });
-
 });
 
 export default router;
