@@ -1,18 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/Productos.css';
 import Menu from '../components/Menu';
 
 function Productos() {
-  // Datos de ejemplo para el grid
-  const productos = [
-    { id: 1, descripcion: 'Detalle del producto 1', precioCosto: 1000.25, precioVenta: 1450.00, stock: 10 },
-    { id: 2, descripcion: 'Detalle del producto 2', precioCosto: 1000.25, precioVenta: 1450.00, stock: 10 },
-    { id: 3, descripcion: 'Detalle del producto 3', precioCosto: 1000.25, precioVenta: 1450.00, stock: 10 },
-    { id: 4, descripcion: 'Detalle del producto 4', precioCosto: 1000.25, precioVenta: 1450.00, stock: 10 },
-    { id: 5, descripcion: 'Detalle del producto 5', precioCosto: 1000.25, precioVenta: 1450.00, stock: 10 },
-    { id: 6, descripcion: 'Detalle del producto 6', precioCosto: 1000.25, precioVenta: 1450.00, stock: 10 },
-    { id: 7, descripcion: 'Detalle del producto 7', precioCosto: 1000.25, precioVenta: 1450.00, stock: 10 }
-  ];
+  const [productos, setProductos] = useState([])
+
+  useEffect(() => {
+    const traerProductos = async() => {
+      try {
+        const resultado = await fetch("http://localhost:3000/productos")
+        const data = await resultado.json()
+        setProductos(data.productos[0])
+        console.log(data.productos[0])
+      } catch (error) {
+        alert("no funca")
+      }
+    }
+    
+    traerProductos()
+    
+  }, [])
+  
 
   const handleVerDetalles = (id) => {
     alert(`voy a la ventana para ver los detalles del producto: ${id}`);
@@ -22,10 +30,9 @@ function Productos() {
     alert(`Borrar producto con ID: ${id}`);
   };
 
-  const handleAgregar = (id) => {
+  const handleAgregar = () => {
     alert(`Aca tengo que ir a la ventana de añadir`);
   };
-
 
   return (
     <>
@@ -42,24 +49,24 @@ function Productos() {
           <tr>
             <th>Buscar</th>
             <th>ID Prod.</th>
-            <th>Descripcion</th>
-            <th>P. Costo</th>
-            <th>P. Venta</th>
+            <th>Nombre Producto</th>
+            <th>Precio de Lista</th>
+            <th>Precio de Venta</th>
             <th>Stock</th>
           </tr>
         </thead>
         <tbody>
-          {productos.map((producto) => (
-            <tr key={producto.id}>
+          {productos && productos.map((producto) => (
+            <tr key={producto.id_producto}>
               <td>
-                <button onClick={() => handleVerDetalles(producto.id)}>🔍</button>
-                <button onClick={() => handleBorrar(producto.id)}>🗑️</button>
+                <button onClick={() => handleVerDetalles(producto.id_producto)}>🔍</button>
+                <button onClick={() => handleBorrar(producto.id_producto)}>🗑️</button>
               </td>
-              <td>{producto.id}</td>
-              <td>{producto.descripcion}</td>
-              <td>${producto.precioCosto.toFixed(2)}</td>
-              <td>${producto.precioVenta.toFixed(2)}</td>
-              <td>{producto.stock}</td>
+              <td>{producto.id_producto}</td>
+              <td>{producto.nombre_producto}</td>
+              <td>${producto.precio_lista}</td>
+              <td>${producto.precio_final}</td>
+              <td>{producto.stock_actual}</td>
             </tr>
           ))}
         </tbody>
