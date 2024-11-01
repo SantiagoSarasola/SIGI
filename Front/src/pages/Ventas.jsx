@@ -4,13 +4,21 @@ import '../styles/Ventas.css';
 
 function Ventas() {
   return (
+    <>
+    <div>
+        <Menu />
+    </div>
+    
+    
     <div className="ventas">
-      <Menu />
+      
       <div className="contenido">
         <h2>Ventas</h2>
         <p>ventana de Ventas.</p>
       </div>
     </div>
+
+    </>
   );
 }
 
