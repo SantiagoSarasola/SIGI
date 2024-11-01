@@ -15,24 +15,28 @@ function Productos() {
   ];
 
   const handleVerDetalles = (id) => {
-    alert(`Ver detalles del producto con ID: ${id}`);
+    alert(`voy a la ventana para ver los detalles del producto: ${id}`);
   };
 
   const handleBorrar = (id) => {
     alert(`Borrar producto con ID: ${id}`);
   };
 
+  const handleAgregar = (id) => {
+    alert(`Aca tengo que ir a la ventana de añadir`);
+  };
+
+
   return (
     <>
       <div>
         <Menu />
       </div>
-      
-    
     <div className="productos">
-      
-      <h2>Productos</h2>
-      <button className="btn-nuevo">Añadir Nuevo</button>
+        <div className="header-productos">
+          <h2>Productos</h2>
+          <button className="btn-nuevo" onClick={() => handleAgregar()}>Añadir Nuevo</button>
+        </div>
       <table className="productos-tabla">
         <thead>
           <tr>
