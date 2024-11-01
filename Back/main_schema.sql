@@ -137,8 +137,8 @@ INSERT INTO ventas_producto (id_venta, id_producto, cantidad, subtotal_venta) VA
 (3, 3, 3, 90.00);
 
 -- STORE PROCEDURES
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `get_productos`(
+DELIMITER //
+CREATE PROCEDURE spVerProductos(
 	  IN filaInicial INT, 
     IN limite INT, 
     IN colOrden VARCHAR(50), 
@@ -170,13 +170,10 @@ BEGIN
         SELECT 
             p.id_producto,
             p.nombre_producto,
-            p.stock_actual,
             p.precio_lista,
-            c.descripcion AS categoria_producto
-        FROM 
-            productos AS p
-        JOIN 
-            categorias_producto AS c ON p.id_categoria = c.id_categoria
+            p.precio_final,
+            p.stock_actual
+        FROM productos AS p
         ORDER BY ', colValida, ' ', dirValida, '
         LIMIT ? OFFSET ?
     ');
@@ -184,7 +181,7 @@ BEGIN
     PREPARE sp_get_productos FROM @consulta;
     EXECUTE sp_get_productos USING @limite, @filaInicial;
     DEALLOCATE PREPARE sp_get_productos;
-END$$
+END//
 DELIMITER ;
 
 DELIMITER //
@@ -204,3 +201,28 @@ BEGIN
 END//
 DELIMITER ;
 
+DELIMITER //
+CREATE PROCEDURE spNuevoProducto(
+    IN nombre_producto VARCHAR(100),
+    IN stock_actual INT,
+    IN precio_lista DECIMAL(10, 2),
+    IN descuento_uno DECIMAL(10, 2),
+    IN costo_intermedio DECIMAL(10, 2),
+    IN descuento_dos DECIMAL(10, 2),
+    IN costo_final DECIMAL(10, 2),
+    IN incremento DECIMAL(10, 2),
+    IN precio_sugerido DECIMAL(10, 2),
+    IN precio_final DECIMAL(10, 2),
+    IN ganancia DECIMAL(10, 2),
+    IN id_categoria INT,
+    IN id_fabrica INT
+)
+BEGIN
+    INSERT INTO productos (nombre_producto, stock_actual, precio_lista, descuento_uno, 
+    costo_intermedio, descuento_dos, costo_final, incremento, precio_sugerido, 
+    precio_final, ganancia, id_categoria, id_fabrica)
+    VALUES (nombre_producto, stock_actual, precio_lista, descuento_uno, 
+    costo_intermedio, descuento_dos, costo_final, incremento, precio_sugerido, 
+    precio_final, ganancia, id_categoria, id_fabrica);
+END //
+DELIMITER ;
