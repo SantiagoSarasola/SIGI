@@ -204,3 +204,26 @@ BEGIN
 END//
 DELIMITER ;
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spNuevoProducto`(
+    IN nombre_producto VARCHAR(100),
+    IN stock_actual INT,
+    IN precio_lista DECIMAL(10, 2),
+    IN descuento_uno DECIMAL(10, 2),
+    IN costo_intermedio DECIMAL(10, 2),
+    IN descuento_dos DECIMAL(10, 2),
+    IN costo_final DECIMAL(10, 2),
+    IN incremento DECIMAL(10, 2),
+    IN precio_sugerido DECIMAL(10, 2),
+    IN precio_final DECIMAL(10, 2),
+    IN ganancia DECIMAL(10, 2),
+    IN id_categoria INT,
+    IN id_fabrica INT
+)
+BEGIN
+    INSERT INTO productos (nombre_producto, stock_actual, precio_lista, descuento_uno, 
+    costo_intermedio, descuento_dos, costo_final, incremento, precio_sugerido, 
+    precio_final, ganancia, id_categoria, id_fabrica)
+    VALUES (nombre_producto, stock_actual, precio_lista, descuento_uno, 
+    costo_intermedio, descuento_dos, costo_final, incremento, precio_sugerido, 
+    precio_final, ganancia, id_categoria, id_fabrica);
+END
