@@ -155,6 +155,7 @@ BEGIN
     SET colValida = CASE 
         WHEN colOrden = 'nombre_producto' THEN 'nombre_producto'
         WHEN colOrden = 'precio_lista' THEN 'precio_lista'
+        WHEN colOrden = 'precio_final' THEN 'precio_final'
         WHEN colOrden = 'stock_actual' THEN 'stock_actual'
         ELSE 'nombre_producto'
     END;

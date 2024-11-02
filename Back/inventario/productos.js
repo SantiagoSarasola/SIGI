@@ -1,10 +1,12 @@
 import express from "express";
 import { db } from "../db.js";
+import validarPaginacionProductos from "../middlewares/validarPaginacionProductos.js";
 import validarId from "../middlewares/validarId.js";
 import validarAtributosProducto from "../middlewares/validarAtributosProducto.js";
+import { validationResult } from "express-validator";
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", validarPaginacionProductos(), async (req, res) => {
   const {
     offset = 0,
     limit = 10,
@@ -12,13 +14,17 @@ router.get("/", async (req, res) => {
     order = "ASC",
   } = req.query;
 
+  const validacion = validationResult(req);
+  if (!validacion.isEmpty()) {
+    return res.status(400).send({ errores: validacion.array() });
+  }
+
   try {
     const sql = "CALL spVerProductos(?, ?, ?, ?)";
     const [productos] = await db.execute(sql, [offset, limit, sort, order]);
 
     return res.status(200).send({ productos });
   } catch (error) {
-    console.error("Error al insertar el producto: ", error.message);
     return res.status(500).send({ error: "Error al traer productos" });
   }
 });
