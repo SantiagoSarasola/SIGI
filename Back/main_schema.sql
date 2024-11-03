@@ -33,6 +33,7 @@ CREATE TABLE `productos` (
   `id_categoria` int NOT NULL,
   `id_fabrica` int NOT NULL,
   PRIMARY KEY (`id_producto`),
+  `is_deleted` BOOLEAN DEFAULT FALSE,
   KEY `id_categoria` (`id_categoria`),
   KEY `id_fabrica` (`id_fabrica`),
   CONSTRAINT `id_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categorias_producto` (`id_categoria`),
@@ -226,4 +227,11 @@ BEGIN
     costo_intermedio, descuento_dos, costo_final, incremento, precio_sugerido, 
     precio_final, ganancia, id_categoria, id_fabrica);
 END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE spEliminarProducto(IN idProducto INT)
+BEGIN 
+		UPDATE productos SET is_deleted = TRUE WHERE id_producto = idProducto;
+END//
 DELIMITER ;
