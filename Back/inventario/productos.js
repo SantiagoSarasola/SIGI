@@ -29,7 +29,14 @@ router.get("/", validarPaginacionProductos(), async (req, res) => {
   }
 });
 
-router.put("/:id", validarId, validarAtributosProducto, async (req, res) => {
+router.put("/:id", validarId(), validarAtributosProducto(), async (req, res) => {
+
+  const validacion = validationResult(req);
+  if (!validacion.isEmpty()) {
+    res.status(400).send({ errores: validacion.array() });
+    return;
+  }
+
   const id = Number(req.params.id);
   const nombreProducto = req.body.nombreProducto;
   const stockActual = req.body.stockActual;
@@ -90,7 +97,14 @@ router.put("/:id", validarId, validarAtributosProducto, async (req, res) => {
   }
 });
 
-router.post("/", validarAtributosProducto, async (req, res) => {
+router.post("/", validarAtributosProducto(), async (req, res) => {
+
+  const validacion = validationResult(req);
+  if (!validacion.isEmpty()) {
+    res.status(400).send({ errores: validacion.array() });
+    return;
+  }
+
   const nombreProducto = req.body.nombreProducto;
   const stockActual = req.body.stockActual;
   const precioLista = req.body.precioLista;
@@ -129,6 +143,27 @@ router.post("/", validarAtributosProducto, async (req, res) => {
   } catch (error) {
     console.error("Error al insertar el producto: ", error.message);
     return res.status(500).send({ error: "Error al insertar el producto" });
+  }
+});
+
+router.delete("/:id", validarId(), async(req,res) => {
+  
+  const validacion = validationResult(req);
+  if (!validacion.isEmpty()) {
+    res.status(400).send({ errores: validacion.array() });
+    return;
+  }
+
+  const id = Number(req.params.id);
+
+  const sql = "CALL spEliminarProducto(?)";
+
+  try {
+    await db.query(sql, [id]);
+    return res.status(200).send({ id });
+  } catch (error) {
+    console.error("Error al eliminar el producto: ", error.message);
+    return res.status(500).send({ error: "Error al eliminar el producto" });
   }
 });
 
