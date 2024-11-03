@@ -231,7 +231,7 @@ DELIMITER ;
 
 DELIMITER //
 CREATE PROCEDURE spEliminarProducto(IN idProducto INT)
-   BEGIN 
+BEGIN 
 		UPDATE productos SET is_deleted = TRUE WHERE id_producto = idProducto;
-	END//
+END//
 DELIMITER ;
