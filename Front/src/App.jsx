@@ -5,6 +5,7 @@ import Ventas from './pages/Ventas';
 import Productos from './pages/Productos';
 import AgregarProducto from './pages/AgregarProducto';
 import DetalleProducto from './pages/DetalleProducto';
+import EditarProducto from './pages/EditarProducto';
 
 
 function App() {

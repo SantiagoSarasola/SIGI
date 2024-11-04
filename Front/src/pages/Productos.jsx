@@ -37,7 +37,7 @@ function Productos() {
   };
 
   const handleAgregar = () => {
-    alert(`Aca tengo que ir a la ventana de añadir`);
+    navigate(`./agregar_producto`);
   };
 
   return (
