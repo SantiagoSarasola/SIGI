@@ -56,7 +56,6 @@ const DetalleProducto = ({ product = productoEjemplo }) => {
         <div>{product.fabrica}</div>
       </div>
       <button onClick={() => {
-        window.history.back()
         alert("Se cancelo la operacion!")}} className={`${styles.button} ${styles.cancelButton}`}>Cancelar</button>
       <button className={`${styles.button} ${styles.saveButton}`} onClick={handleEdit}>Editar</button>
     </div>

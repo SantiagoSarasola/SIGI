@@ -26,9 +26,8 @@ function Productos() {
     traerProductos();
   }, [sort]);
 
-  const navigate = useNavigate(); 
   const handleVerDetalles = (id) => {
-    navigate(`./editar_producto/${id}`); 
+    alert(`aca tengo que ver la pagina de detalle:${id}`); 
     };
 
 
@@ -37,7 +36,7 @@ function Productos() {
   };
 
   const handleAgregar = () => {
-    navigate(`./agregar_producto`);
+    alert('aca tengo que ver la pagina de agregar producto');
   };
 
   return (
