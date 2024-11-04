@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Productos.css";
 import Menu from "../components/Menu";
+import { useNavigate } from 'react-router-dom';
+
 
 function Productos() {
   const [productos, setProductos] = useState([]);
@@ -24,9 +26,11 @@ function Productos() {
     traerProductos();
   }, [sort]);
 
+  const navigate = useNavigate(); 
   const handleVerDetalles = (id) => {
-    alert(`voy a la ventana para ver los detalles del producto: ${id}`);
-  };
+    navigate(`./editar_producto/${id}`); 
+    };
+
 
   const handleBorrar = (id) => {
     alert(`Borrar producto con ID: ${id}`);
