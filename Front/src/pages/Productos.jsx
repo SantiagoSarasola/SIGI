@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Productos.css";
 import Menu from "../components/Menu";
-import { useNavigate } from 'react-router-dom';
+
 
 
 function Productos() {
