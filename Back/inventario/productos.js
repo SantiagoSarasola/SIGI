@@ -29,6 +29,29 @@ router.get("/", validarPaginacionProductos(), async (req, res) => {
   }
 });
 
+router.get("/:id", validarId(), async (req, res) => {
+  const validacion = validationResult(req);
+  if (!validacion.isEmpty()) {
+    return res.status(400).send({ errores: validacion.array() });
+  }
+
+  const id = Number(req.params.id);
+
+  try {
+    const sql = "CALL spVerProductoPorId(?)";
+    const [producto] = await db.execute(sql, [id]);
+
+    if (producto[0].length === 0) {
+      return res.status(404).send({ error: "Producto no encontrado" });
+    }
+
+    return res.status(200).send({ producto: producto[0][0] });
+  } catch (error) {
+    console.error("Error al traer el producto: ", error.message);
+    return res.status(500).send({ error: "Error al traer el producto" });
+  }
+});
+
 router.put(
   "/:id",
   validarId(),
