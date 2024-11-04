@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../Styles/ProductPage.module.css';
+import styles from '../styles/DetalleProducto.module.css';
 import { useNavigate } from 'react-router-dom';
 
 //Ejemplo producto
