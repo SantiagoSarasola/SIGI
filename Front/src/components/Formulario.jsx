@@ -1,48 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import styles from '../Styles/Formulario.module.css';
 
-const Formulario = ({ product, onSave, onCancel, isEditMode }) => {
+const Formulario = () => {
   const [data, setData] = useState({
-    id: product?.id || 0,
-    nombreProducto: product?.name || '',
-    stockActual: product?.stock || 0,
-    precioLista: product?.precioLista || 0,
-    descuentoUno: product?.descuentoUno || 0,
-    costoIntermedio: product?.costoIntermedio || 0,
-    descuentoDos: product?.descuentoDos || 0,
-    costoFinal: product?.costoFinal || 0,
-    incremento: product?.incremento || 0,
-    precioSugerido: product?.precioSugerido || 0,
-    precioFinal: product?.precioFinal || 0,
-    ganancia: product?.ganancia || 0,
-    categoria: product?.categoria || '',
-    fabrica: product?.fabrica || ''
+    id: 0,
+    nombreProducto:  '',
+    stockActual: 0,
+    precioLista: 0,
+    descuentoUno:  0,
+    costoIntermedio:  0,
+    descuentoDos: 0,
+    costoFinal:  0,
+    incremento:  0,
+    precioSugerido:  0,
+    precioFinal: 0,
+    ganancia: 0,
+    categoria: '',
+    fabrica: ''
   });
   
-  useEffect(() => {
-    if (product) {
-      setData(product);
-    }
-  }, [product]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave(data);
-  };
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  // };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.formContainer}>
-      {isEditMode && (
+    <form  className={styles.formContainer}>
         <div className={styles.formGroup}>
           <label>ID Producto</label>
           <input type="text" value={data.id} readOnly/>
         </div>
-      )}
+      
       <div className={styles.formGroup}>
         <label>Nombre del Producto</label>
         <input type="text" name="nombre" value={data.nombreProducto} onChange={handleChange}/>
@@ -105,7 +98,7 @@ const Formulario = ({ product, onSave, onCancel, isEditMode }) => {
         </select>
       </div>
       <div className={styles.buttonGroup}>
-        <button type="button" onClick={onCancel} className={`${styles.button} ${styles.cancelButton}`}>Cancelar</button>
+        <button type="button" onClick={()=>alert("Se cancelo la operacion!")} className={`${styles.button} ${styles.cancelButton}`}>Cancelar</button>
         <button type="submit" className={`${styles.button} ${styles.saveButton}`} onClick={()=>alert("Se enviaron los datos!")}>Guardar y Cerrar</button>
       </div>
     </form>
