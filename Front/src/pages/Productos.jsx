@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "../styles/Productos.css";
 import Menu from "../components/Menu";
 
+
+
 function Productos() {
   const [productos, setProductos] = useState([]);
   const [sort, setSort] = useState("nombre_producto");
@@ -25,15 +27,16 @@ function Productos() {
   }, [sort]);
 
   const handleVerDetalles = (id) => {
-    alert(`voy a la ventana para ver los detalles del producto: ${id}`);
-  };
+    alert(`aca tengo que ver la pagina de detalle:${id}`); 
+    };
+
 
   const handleBorrar = (id) => {
     alert(`Borrar producto con ID: ${id}`);
   };
 
   const handleAgregar = () => {
-    alert(`Aca tengo que ir a la ventana de añadir`);
+    alert('aca tengo que ver la pagina de agregar producto');
   };
 
   return (
