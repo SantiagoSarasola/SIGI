@@ -10,7 +10,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
 
     try {
-        let sql = "SELECT * FROM usuarios";
+        const sql = "CALL spVerUsuarios";
         const [usuarios] = await db.execute(sql);
 
         return res.status(200).send({ usuarios });

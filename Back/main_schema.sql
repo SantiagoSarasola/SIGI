@@ -33,7 +33,7 @@ CREATE TABLE `productos` (
   `id_categoria` int NOT NULL,
   `id_fabrica` int NOT NULL,
   PRIMARY KEY (`id_producto`),
-  `is_deleted` BOOLEAN DEFAULT FALSE,
+  `inhabilitado` BOOLEAN DEFAULT FALSE,
   KEY `id_categoria` (`id_categoria`),
   KEY `id_fabrica` (`id_fabrica`),
   CONSTRAINT `id_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categorias_producto` (`id_categoria`),
@@ -57,6 +57,7 @@ CREATE TABLE `usuarios` (
   `email` varchar(50) NOT NULL,
   `password` varchar(60) NOT NULL,
   `id_rol` int NOT NULL,
+  `inhabilitado` BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `password_UNIQUE` (`password`),
@@ -234,7 +235,14 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE spEliminarProducto(IN idProducto INT)
 BEGIN 
-		UPDATE productos SET is_deleted = TRUE WHERE id_producto = idProducto;
+		UPDATE productos SET inhabilitado = TRUE WHERE id_producto = idProducto;
+END//
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE spVerUsuarios()
+BEGIN 
+		SELECT * FROM usuarios WHERE inhabilitado = FALSE;
 END//
 DELIMITER ;
 
@@ -249,3 +257,11 @@ BEGIN
     VALUES (email, password, idRol);
 END //
 DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE spEliminarUsuario(IN idUsuario INT)
+BEGIN 
+		UPDATE usuarios SET inhabilitado = TRUE WHERE id_usuario = idUsuario;
+END//
+DELIMITER ;
+
