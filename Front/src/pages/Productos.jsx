@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+=======
+import { useState, useEffect } from "react";
+>>>>>>> 01309091c5b0d78b9bad6f67cd0598a7dc57f184
 import "../styles/Productos.css";
 import Menu from "../components/Menu";
 
@@ -16,7 +20,8 @@ function Productos() {
           `http://localhost:3000/productos?offset=0&limit=10&sort=${sort}&order=DESC&search=${terminoBusqueda}`
         );
         const data = await resultado.json();
-        setProductos(data.productos[0]);
+        console.log("Data: ", data);
+        setProductos(data.productos);
       } catch (error) {
         alert("No se pudo obtener los productos");
       }
@@ -34,12 +39,16 @@ function Productos() {
   };
 
   const handleAgregar = () => {
+<<<<<<< HEAD
     navigate("/agregarproducto");
   };
 
   const handleBuscar = () => {
     // Al actualizar `terminoBusqueda`, `useEffect` se encargará de llamar a la API automáticamente.
     console.log("Buscando productos con el término:", terminoBusqueda);
+=======
+    alert("aca tengo que ver la pagina de agregar producto");
+>>>>>>> 01309091c5b0d78b9bad6f67cd0598a7dc57f184
   };
 
   return (
