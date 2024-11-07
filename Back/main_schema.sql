@@ -179,8 +179,10 @@ BEGIN
             p.nombre_producto,
             p.precio_lista,
             p.precio_final,
-            p.stock_actual
+            p.stock_actual,
+            c.descripcion AS categoria
         FROM productos AS p
+        JOIN categorias_producto AS c ON p.id_categoria = c.id_categoria
         WHERE p.inhabilitado = 0
         ORDER BY ', colValida, ' ', dirValida, '
         LIMIT ', filaInicial, ', ', limite
