@@ -141,6 +141,7 @@ INSERT INTO ventas_producto (id_venta, id_producto, cantidad, subtotal_venta) VA
 (3, 3, 3, 90.00);
 
 -- STORE PROCEDURES
+-- GET ALL
 DELIMITER //
 CREATE PROCEDURE spVerProductos(
 	  IN filaInicial INT, 
@@ -151,9 +152,10 @@ CREATE PROCEDURE spVerProductos(
 BEGIN
 	  DECLARE colValida VARCHAR(50);
     DECLARE dirValida VARCHAR(4);
-
-	  SET @limite = IFNULL(limite, 10);
-    SET @filaInicial = IFNULL(filaInicial, 0);
+    
+    -- Elige un valor predeterminado si no hay valor de entrada
+    SET limite = IFNULL(limite, 10);
+    SET filaInicial = IFNULL(filaInicial, 0);
 
     -- Validar columna de ordenamiento
     SET colValida = CASE 
@@ -179,16 +181,49 @@ BEGIN
             p.precio_final,
             p.stock_actual
         FROM productos AS p
+        WHERE p.inhabilitado = 0
         ORDER BY ', colValida, ' ', dirValida, '
-        LIMIT ? OFFSET ?
-    ');
+        LIMIT ', filaInicial, ', ', limite
+        );
 
     PREPARE sp_get_productos FROM @consulta;
-    EXECUTE sp_get_productos USING @limite, @filaInicial;
+    EXECUTE sp_get_productos;
     DEALLOCATE PREPARE sp_get_productos;
 END//
 DELIMITER ;
 
+-- GET BY ID
+DELIMITER //
+CREATE PROCEDURE spVerProductoPorId(
+    IN id INT
+    )
+BEGIN
+    SET @consulta = CONCAT('
+        SELECT 
+            p.id_producto,
+            p.nombre_producto,
+            p.stock_actual,
+            p.precio_lista,
+            p.descuento_uno,
+            p.descuento_dos,
+            p.costo_final,
+            p.incremento,
+            p.precio_final,
+            p.ganancia,
+            c.descripcion AS categoria
+        FROM productos AS p
+        JOIN categorias_producto AS c ON p.id_categoria = c.id_categoria
+        WHERE p.id_producto = ? AND p.inhabilitado = 0
+    ');
+
+    PREPARE sp_get_producto_by_id FROM @consulta;
+    SET @producto_id = id;
+    EXECUTE sp_get_producto_by_id USING @producto_id;
+    DEALLOCATE PREPARE sp_get_producto_by_id;
+END//
+DELIMITER ;
+
+-- UPDATE
 DELIMITER //
 CREATE PROCEDURE spModificarProducto(
    IN nombreProducto VARCHAR(100), IN stockActual INT, IN precioLista DECIMAL(10,2), 
@@ -206,6 +241,7 @@ BEGIN
 END//
 DELIMITER ;
 
+-- INSERT
 DELIMITER //
 CREATE PROCEDURE spNuevoProducto(
     IN nombre_producto VARCHAR(100),
@@ -232,6 +268,7 @@ BEGIN
 END //
 DELIMITER ;
 
+-- SOFT DELETE
 DELIMITER //
 CREATE PROCEDURE spEliminarProducto(IN idProducto INT)
 BEGIN 

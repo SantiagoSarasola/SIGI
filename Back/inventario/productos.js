@@ -23,59 +23,66 @@ router.get("/", validarPaginacionProductos(), async (req, res) => {
     const sql = "CALL spVerProductos(?, ?, ?, ?)";
     const [productos] = await db.execute(sql, [offset, limit, sort, order]);
 
-    return res.status(200).send({ productos });
+    return res.status(200).send({ productos: productos[0] });
   } catch (error) {
     return res.status(500).send({ error: "Error al traer productos" });
   }
 });
 
-router.put("/:id", validarId(), validarAtributosProducto(), async (req, res) => {
-
+router.get("/:id", validarId(), async (req, res) => {
   const validacion = validationResult(req);
   if (!validacion.isEmpty()) {
-    res.status(400).send({ errores: validacion.array() });
-    return;
+    return res.status(400).send({ errores: validacion.array() });
   }
 
   const id = Number(req.params.id);
-  const nombreProducto = req.body.nombreProducto;
-  const stockActual = req.body.stockActual;
-  const precioLista = req.body.precioLista;
-  const descuentoUno = req.body.descuentoUno;
-  const costoIntermedio = req.body.costoIntermedio;
-  const descuentoDos = req.body.descuentoDos;
-  const costoFinal = req.body.costoFinal;
-  const incremento = req.body.incremento;
-  const precioSugerido = req.body.precioSugerido;
-  const precioFinal = req.body.precioFinal;
-  const ganancia = req.body.ganancia;
-  const idCategoria = req.body.idCategoria;
-  const idFabrica = req.body.idFabrica;
-
-  const sql =
-    "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
   try {
-    await db.query(sql, [
-      nombreProducto,
-      stockActual,
-      precioLista,
-      descuentoUno,
-      costoIntermedio,
-      descuentoDos,
-      costoFinal,
-      incremento,
-      precioSugerido,
-      precioFinal,
-      ganancia,
-      idCategoria,
-      idFabrica,
-      id,
-    ]);
+    const sql = "CALL spVerProductoPorId(?)";
+    const [producto] = await db.execute(sql, [id]);
 
-    return res.status(200).send({
-      producto: {
-        id,
+    if (producto[0].length === 0) {
+      return res.status(404).send({ error: "Producto no encontrado" });
+    }
+
+    return res.status(200).send({ producto: producto[0][0] });
+  } catch (error) {
+    console.error("Error al traer el producto: ", error.message);
+    return res.status(500).send({ error: "Error al traer el producto" });
+  }
+});
+
+router.put(
+  "/:id",
+  validarId(),
+  validarAtributosProducto(),
+  async (req, res) => {
+    const validacion = validationResult(req);
+    if (!validacion.isEmpty()) {
+      res.status(400).send({ errores: validacion.array() });
+      return;
+    }
+
+    const id = Number(req.params.id);
+    const nombreProducto = req.body.nombreProducto;
+    const stockActual = req.body.stockActual;
+    const precioLista = req.body.precioLista;
+    const descuentoUno = req.body.descuentoUno;
+    const costoIntermedio = req.body.costoIntermedio;
+    const descuentoDos = req.body.descuentoDos;
+    const costoFinal = req.body.costoFinal;
+    const incremento = req.body.incremento;
+    const precioSugerido = req.body.precioSugerido;
+    const precioFinal = req.body.precioFinal;
+    const ganancia = req.body.ganancia;
+    const idCategoria = req.body.idCategoria;
+    const idFabrica = req.body.idFabrica;
+
+    const sql =
+      "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    try {
+      await db.query(sql, [
         nombreProducto,
         stockActual,
         precioLista,
@@ -89,16 +96,35 @@ router.put("/:id", validarId(), validarAtributosProducto(), async (req, res) => 
         ganancia,
         idCategoria,
         idFabrica,
-      },
-    });
-  } catch (error) {
-    console.error("Error al editar el producto: ", error.message);
-    return res.status(500).send({ error: "Error al editar el producto" });
+        id,
+      ]);
+
+      return res.status(200).send({
+        producto: {
+          id,
+          nombreProducto,
+          stockActual,
+          precioLista,
+          descuentoUno,
+          costoIntermedio,
+          descuentoDos,
+          costoFinal,
+          incremento,
+          precioSugerido,
+          precioFinal,
+          ganancia,
+          idCategoria,
+          idFabrica,
+        },
+      });
+    } catch (error) {
+      console.error("Error al editar el producto: ", error.message);
+      return res.status(500).send({ error: "Error al editar el producto" });
+    }
   }
-});
+);
 
 router.post("/", validarAtributosProducto(), async (req, res) => {
-
   const validacion = validationResult(req);
   if (!validacion.isEmpty()) {
     res.status(400).send({ errores: validacion.array() });
@@ -146,8 +172,7 @@ router.post("/", validarAtributosProducto(), async (req, res) => {
   }
 });
 
-router.delete("/:id", validarId(), async(req,res) => {
-  
+router.delete("/:id", validarId(), async (req, res) => {
   const validacion = validationResult(req);
   if (!validacion.isEmpty()) {
     res.status(400).send({ errores: validacion.array() });
