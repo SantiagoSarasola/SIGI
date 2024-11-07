@@ -6,6 +6,7 @@ import Menu from "../components/Menu";
 function Productos() {
   const [productos, setProductos] = useState([]);
   const [sort, setSort] = useState("nombre_producto");
+  const [order, setOrder] = useState("DESC");
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
   const navigate = useNavigate();
 
@@ -13,7 +14,7 @@ function Productos() {
     const traerProductos = async () => {
       try {
         const resultado = await fetch(
-          `http://localhost:3000/productos?offset=0&limit=10&sort=${sort}&order=DESC&search=${terminoBusqueda}`
+          `http://localhost:3000/productos?offset=0&limit=10&sort=${sort}&order=${order}&search=${terminoBusqueda}`
         );
         const data = await resultado.json();
         console.log("Data: ", data);
@@ -24,7 +25,7 @@ function Productos() {
     };
 
     traerProductos();
-  }, [sort, terminoBusqueda]);
+  }, [sort, order, terminoBusqueda]);
 
   const handleVerDetalles = (id) => {
     alert(`aca tengo que ver la pagina de detalle:${id}`);
@@ -36,6 +37,21 @@ function Productos() {
 
   const handleAgregar = () => {
     navigate("/agregarproducto");
+  };
+
+  const handleSort = (columnaClickeada) => {
+    if (sort === columnaClickeada) {
+      setOrder(order === "ASC" ? "DESC" : "ASC");
+    } else {
+      setSort(columnaClickeada);
+      setOrder("ASC");
+    }
+  };
+
+  const mostrarFlecha = (columnaClickeada) => {
+    if (sort === columnaClickeada) {
+      return order === "ASC" ? "🔼" : "🔽";
+    }
   };
 
   const handleBuscar = () => {
@@ -60,13 +76,21 @@ function Productos() {
             <tr>
               <th></th>
               <th>ID Prod.</th>
-              <th onClick={() => setSort("nombre_producto")}>
-                Nombre Producto
+              <th onClick={() => handleSort("nombre_producto")}>
+                Nombre Producto {mostrarFlecha("nombre_producto")}
               </th>
-              <th onClick={() => setSort("precio_lista")}>Precio de Lista</th>
-              <th onClick={() => setSort("precio_final")}>Precio de Venta</th>
-              <th onClick={() => setSort("stock_actual")}>Stock</th>
-              <th onClick={() => setSort("categoria")}>Categoria</th>
+              <th onClick={() => handleSort("precio_lista")}>
+                Precio de Lista {mostrarFlecha("precio_lista")}
+              </th>
+              <th onClick={() => handleSort("precio_final")}>
+                Precio de Venta {mostrarFlecha("precio_final")}
+              </th>
+              <th onClick={() => handleSort("stock_actual")}>
+                Stock {mostrarFlecha("stock_actual")}
+              </th>
+              <th onClick={() => handleSort("categoria")}>
+                Categoria {mostrarFlecha("categoria")}
+              </th>
             </tr>
             <tr>
               <th>

@@ -7,7 +7,6 @@
   align-items: center;
   gap: 10px; /* Espacio entre el título y el botón */
   margin-bottom: 10px;
-  
 }
 
 .btn-nuevo {
@@ -22,7 +21,8 @@
   cursor: pointer;
 }
 
-.productos-tabla th, .productos-tabla td {
+.productos-tabla th,
+.productos-tabla td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: center;
@@ -31,6 +31,7 @@
 .productos-tabla th {
   background-color: #0078d7;
   color: white;
+  cursor: pointer;
 }
 
 .productos-tabla tr:nth-child(even) {
@@ -41,7 +42,7 @@
   background-color: #ddd;
 }
 
-.btn-buscar{
+.btn-buscar {
   padding: 5px 10px;
   font-size: 16px;
   cursor: pointer;
@@ -61,7 +62,7 @@
   font-size: 16px;
 }
 
-.textBox{
+.textBox {
   border-radius: 5px;
   height: 25px;
   width: 80%;
