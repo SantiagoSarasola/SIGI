@@ -163,6 +163,7 @@ BEGIN
         WHEN colOrden = 'precio_lista' THEN 'precio_lista'
         WHEN colOrden = 'precio_final' THEN 'precio_final'
         WHEN colOrden = 'stock_actual' THEN 'stock_actual'
+        WHEN colOrden = 'categoria' THEN 'categoria'
         ELSE 'nombre_producto'
     END;
 
