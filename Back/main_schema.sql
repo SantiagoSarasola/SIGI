@@ -181,7 +181,7 @@ BEGIN
             p.precio_final,
             p.stock_actual
         FROM productos AS p
-        WHERE p.is_deleted = 0
+        WHERE p.inhabilitado = 0
         ORDER BY ', colValida, ' ', dirValida, '
         LIMIT ', filaInicial, ', ', limite
         );
@@ -213,7 +213,7 @@ BEGIN
             c.descripcion AS categoria
         FROM productos AS p
         JOIN categorias_producto AS c ON p.id_categoria = c.id_categoria
-        WHERE p.id_producto = ? AND p.is_deleted = 0
+        WHERE p.id_producto = ? AND p.inhabilitado = 0
     ');
 
     PREPARE sp_get_producto_by_id FROM @consulta;
