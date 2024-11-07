@@ -11,16 +11,18 @@
 
 .btn-nuevo {
   padding: 5px 10px;
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
 }
 
 .productos-tabla {
   width: 100%;
   border-collapse: collapse;
+  cursor: pointer;
 }
 
-.productos-tabla th, .productos-tabla td {
+.productos-tabla th,
+.productos-tabla td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: center;
@@ -29,6 +31,7 @@
 .productos-tabla th {
   background-color: #0078d7;
   color: white;
+  cursor: pointer;
 }
 
 .productos-tabla tr:nth-child(even) {
@@ -39,9 +42,28 @@
   background-color: #ddd;
 }
 
-.productos-tabla button {
+.btn-buscar {
+  padding: 5px 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn-detalles {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 16px;
+}
+
+.btn-eliminar {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.textBox {
+  border-radius: 5px;
+  height: 25px;
+  width: 80%;
 }

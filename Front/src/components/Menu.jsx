@@ -22,9 +22,9 @@ function Menu() {
             <li>
               <Link to="/" onClick={() => setMenuAbierto(false)}>Inicio</Link>
             </li>
-            <li>
+            {/* <li>
               <Link to="/ventas" onClick={() => setMenuAbierto(false)}>Ventas</Link>
-            </li>
+            </li> */}
             <li>
               <Link to="/productos" onClick={() => setMenuAbierto(false)}>Productos</Link>
             </li>
