@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "../styles/Productos.css";
 import Menu from "../components/Menu";
-
-
 
 function Productos() {
   const [productos, setProductos] = useState([]);
@@ -17,7 +15,8 @@ function Productos() {
           `http://localhost:3000/productos?offset=0&limit=10&sort=${sort}&order=DESC`
         );
         const data = await resultado.json();
-        setProductos(data.productos[0]);
+        console.log("Data: ", data);
+        setProductos(data.productos);
       } catch (error) {
         alert("no funca");
       }
@@ -27,16 +26,15 @@ function Productos() {
   }, [sort]);
 
   const handleVerDetalles = (id) => {
-    alert(`aca tengo que ver la pagina de detalle:${id}`); 
-    };
-
+    alert(`aca tengo que ver la pagina de detalle:${id}`);
+  };
 
   const handleBorrar = (id) => {
     alert(`Borrar producto con ID: ${id}`);
   };
 
   const handleAgregar = () => {
-    alert('aca tengo que ver la pagina de agregar producto');
+    alert("aca tengo que ver la pagina de agregar producto");
   };
 
   return (
