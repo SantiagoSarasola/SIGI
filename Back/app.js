@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { connectDB } from "./db.js";
 import routerProductos from "./inventario/productos.js";
+import routerUsuarios from "./login/usuarios.js";
 
 connectDB();
 console.log("Base de Datos conectada");
@@ -15,6 +16,7 @@ app.use(cors());
 
 // Conecta la ruta "productos" con el router
 app.use("/productos", routerProductos);
+app.use("/usuarios", routerUsuarios);
 
 app.listen(PORT, (err) => {
   console.log(
