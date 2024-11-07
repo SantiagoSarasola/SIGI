@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-=======
 import { useState, useEffect } from "react";
->>>>>>> 01309091c5b0d78b9bad6f67cd0598a7dc57f184
+import { useNavigate } from "react-router-dom";
 import "../styles/Productos.css";
 import Menu from "../components/Menu";
 
@@ -39,16 +35,12 @@ function Productos() {
   };
 
   const handleAgregar = () => {
-<<<<<<< HEAD
     navigate("/agregarproducto");
   };
 
   const handleBuscar = () => {
     // Al actualizar `terminoBusqueda`, `useEffect` se encargará de llamar a la API automáticamente.
     console.log("Buscando productos con el término:", terminoBusqueda);
-=======
-    alert("aca tengo que ver la pagina de agregar producto");
->>>>>>> 01309091c5b0d78b9bad6f67cd0598a7dc57f184
   };
 
   return (
