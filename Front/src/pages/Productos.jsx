@@ -5,6 +5,7 @@ import Menu from "../components/Menu";
 
 function Productos() {
   const [productos, setProductos] = useState([]);
+  const [productosOriginales, setProductosOriginales] = useState([]);
   const [sort, setSort] = useState("nombre_producto");
   const [order, setOrder] = useState("DESC");
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
@@ -19,13 +20,21 @@ function Productos() {
         const data = await resultado.json();
         console.log("Data: ", data);
         setProductos(data.productos);
+        setProductosOriginales(data.productos);
       } catch (error) {
         alert("No se pudo obtener los productos");
       }
     };
 
     traerProductos();
-  }, [sort, order, terminoBusqueda]);
+  }, [sort, order]);
+
+  useEffect(() => {
+    const productosFiltrados = productosOriginales.filter((producto) =>
+      producto.nombre_producto.toLowerCase().includes(terminoBusqueda.toLowerCase())
+    );
+    setProductos(productosFiltrados);
+  }, [terminoBusqueda, productosOriginales]);
 
   const handleVerDetalles = (id) => {
     alert(`aca tengo que ver la pagina de detalle:${id}`);
@@ -36,7 +45,7 @@ function Productos() {
   };
 
   const handleAgregar = () => {
-    navigate("/agregarproducto");
+    navigate("/agregar_producto");
   };
 
   const handleSort = (columnaClickeada) => {
@@ -52,11 +61,6 @@ function Productos() {
     if (sort === columnaClickeada) {
       return order === "ASC" ? "🔼" : "🔽";
     }
-  };
-
-  const handleBuscar = () => {
-    // Al actualizar `terminoBusqueda`, `useEffect` se encargará de llamar a la API automáticamente.
-    console.log("Buscando productos con el término:", terminoBusqueda);
   };
 
   return (
@@ -93,11 +97,7 @@ function Productos() {
               </th>
             </tr>
             <tr>
-              <th>
-                <button className="btn-buscar" onClick={handleBuscar}>
-                  Buscar
-                </button>
-              </th>
+              <th></th>
               <th></th>
               <th>
                 <input
