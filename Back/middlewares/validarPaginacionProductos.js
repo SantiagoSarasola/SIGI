@@ -16,7 +16,13 @@ const validarPaginacionProductos = () => [
   query("sort")
     .optional()
     .isString()
-    .isIn(["nombre_producto", "precio_lista", "precio_final", "stock_actual"])
+    .isIn([
+      "nombre_producto",
+      "precio_lista",
+      "precio_final",
+      "stock_actual",
+      "categoria",
+    ])
     .withMessage("El sort debe ser un campo válido para ordenar."),
 
   query("order")
