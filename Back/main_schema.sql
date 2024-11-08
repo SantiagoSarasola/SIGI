@@ -194,7 +194,6 @@ BEGIN
             p.descuento_dos,
             p.incremento,
             p.precio_final,
-            p.ganancia,
             c.descripcion AS categoria
         FROM productos AS p
         JOIN categorias_producto AS c ON p.id_categoria = c.id_categoria
