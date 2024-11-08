@@ -192,7 +192,6 @@ BEGIN
             p.precio_lista,
             p.descuento_uno,
             p.descuento_dos,
-            p.costo_final,
             p.incremento,
             p.precio_final,
             p.ganancia,
