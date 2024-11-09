@@ -3,7 +3,7 @@ CREATE TABLE `categorias_producto` (
   `id_categoria` int NOT NULL AUTO_INCREMENT,
   `descripcion` varchar(50) NOT NULL,
   PRIMARY KEY (`id_categoria`),
-  `inhabilitado` BOOLEAN DEFAULT FALSE,
+  `inhabilitado` BOOLEAN DEFAULT FALSE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `formas_pago` (
