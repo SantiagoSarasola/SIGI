@@ -10,7 +10,6 @@ const validarAtributosProducto = (method) => [
     body("incremento").notEmpty().withMessage("El incremento no puede estar vacío").bail().isFloat({ min: 0 }).withMessage("El incremento no puede ser negativo").bail(),
     body("precioFinal").notEmpty().withMessage("El precio final no puede estar vacío").bail().isFloat({ min: 0 }).withMessage("El precio final no puede ser negativo").bail(),
     body("idCategoria").notEmpty().withMessage("El id de la categoría no puede estar vacío").bail().isInt().withMessage("El id de la categoría debe ser un número entero").bail().custom((value) => value >= 0).withMessage("El id de la categoría no puede ser negativo").bail(),
-    body("modificadoPor").notEmpty().withMessage("El id del usuario modificador no puede estar vacío").bail().isInt().withMessage("El id del usuario modificador debe ser un número entero").bail().custom((value) => value >= 0).withMessage("El id del usuario modificador no puede ser negativo").bail(),
   ...(method === "PUT" ? [
       body("modificadoPor").notEmpty().withMessage("El id del usuario modificador no puede estar vacío").bail()
           .isInt().withMessage("El id del usuario modificador debe ser un número entero").bail()
