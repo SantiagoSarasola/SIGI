@@ -55,7 +55,7 @@ router.get("/:id", validarId(), async (req, res) => {
 router.put(
   "/:id",
   validarId(),
-  validarAtributosProducto(),
+  validarAtributosProducto("PUT"),
   async (req, res) => {
     const validacion = validationResult(req);
     if (!validacion.isEmpty()) {
@@ -112,7 +112,7 @@ router.put(
   }
 );
 
-router.post("/", validarAtributosProducto(), async (req, res) => {
+router.post("/", validarAtributosProducto("POST"), async (req, res) => {
   const validacion = validationResult(req);
   if (!validacion.isEmpty()) {
     res.status(400).send({ errores: validacion.array() });
@@ -139,7 +139,7 @@ router.post("/", validarAtributosProducto(), async (req, res) => {
         descuentoDos,
         incremento,
         precioFinal,
-        idCategoria,
+        idCategoria
       ]
     );
 
