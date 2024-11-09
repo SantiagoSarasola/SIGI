@@ -36,30 +36,10 @@ router.get("/:id", validarId(), async (req, res) => {
   }
 
   const id = Number(req.params.id);
-  const nombreProducto = req.body.nombreProducto;
-  const stockActual = req.body.stockActual;
-  const precioLista = req.body.precioLista;
-  const descuentoUno = req.body.descuentoUno;
-  const descuentoDos = req.body.descuentoDos;
-  const incremento = req.body.incremento;
-  const precioFinal = req.body.precioFinal;
-  const idCategoria = req.body.idCategoria;
-
-  const sql =
-    "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
   try {
-    await db.query(sql, [
-      nombreProducto,
-      stockActual,
-      precioLista,
-      descuentoUno,
-      descuentoDos,
-      incremento,
-      precioFinal,
-      idCategoria,
-      id,
-    ]);
+    const sql = "CALL spVerProductoPorId(?)";
+    const [producto] = await db.execute(sql, [id]);
 
     if (producto[0].length === 0) {
       return res.status(404).send({ error: "Producto no encontrado" });
