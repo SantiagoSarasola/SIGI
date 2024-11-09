@@ -12,6 +12,22 @@ CREATE TABLE `formas_pago` (
   PRIMARY KEY (`id_forma_pago`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE `productos` (
+  `id_producto` int NOT NULL AUTO_INCREMENT,
+  `nombre_producto` varchar(100) NOT NULL,
+  `stock_actual` int NOT NULL,
+  `precio_lista` decimal(10,2) DEFAULT NULL,
+  `descuento_uno` decimal(10,2) DEFAULT NULL,
+  `descuento_dos` decimal(10,2) DEFAULT NULL,
+  `incremento` decimal(10,2) DEFAULT NULL,
+  `precio_final` decimal(10,2) DEFAULT NULL,
+  `id_categoria` int NOT NULL,
+  PRIMARY KEY (`id_producto`),
+  `inhabilitado` BOOLEAN DEFAULT FALSE,
+  KEY `id_categoria` (`id_categoria`),
+  CONSTRAINT `id_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categorias_producto` (`id_categoria`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE `roles` (
   `id_rol` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
@@ -30,26 +46,6 @@ CREATE TABLE `usuarios` (
   KEY `id_rol` (`id_rol`),
   CONSTRAINT `id_rol` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-CREATE TABLE `productos` (
-  `id_producto` int NOT NULL AUTO_INCREMENT,
-  `nombre_producto` varchar(100) NOT NULL,
-  `stock_actual` int NOT NULL,
-  `precio_lista` decimal(10,2) DEFAULT NULL,
-  `descuento_uno` decimal(10,2) DEFAULT NULL,
-  `descuento_dos` decimal(10,2) DEFAULT NULL,
-  `incremento` decimal(10,2) DEFAULT NULL,
-  `precio_final` decimal(10,2) DEFAULT NULL,
-  `id_categoria` int NOT NULL,
-  `inhabilitado` tinyint(1) DEFAULT '0',
-  `ultima_fecha_modificacion` datetime DEFAULT NULL,
-  `modificado_por` int DEFAULT NULL,
-  PRIMARY KEY (`id_producto`),
-  KEY `id_categoria` (`id_categoria`),
-  KEY `modificado_por` (`modificado_por`),
-  CONSTRAINT `id_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categorias_producto` (`id_categoria`),
-  CONSTRAINT `modificado_por` FOREIGN KEY (`modificado_por`) REFERENCES `usuarios` (`id_usuario`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `repartidores` (
   `id_repartidor` int NOT NULL AUTO_INCREMENT,
@@ -216,14 +212,12 @@ DELIMITER //
 CREATE PROCEDURE spModificarProducto(
    IN nombreProducto VARCHAR(100), IN stockActual INT, IN precioLista DECIMAL(10,2), 
    IN descuentoUno DECIMAL(10,2), IN descuentoDos DECIMAL(10,2),
-   IN incremento DECIMAL(10,2),
-   IN precioFinal DECIMAL(10,2),
+   IN incremento DECIMAL(10,2), IN precioFinal DECIMAL(10,2),
    IN idCategoria INT, IN modificadoPor INT, IN idProducto INT)
 BEGIN 
 		UPDATE productos 
         SET nombre_producto = nombreProducto, stock_actual = stockActual, precio_lista = precioLista, 
-        descuento_uno = descuentoUno, descuento_dos = descuentoDos, 
-		    incremento = incremento,
+        descuento_uno = descuentoUno, descuento_dos = descuentoDos, incremento = incremento,
         precio_final = precioFinal, id_categoria = idCategoria,
         modificado_por = modificadoPor, ultima_fecha_modificacion = CURRENT_TIMESTAMP()
     WHERE id_producto = idProducto;
@@ -243,11 +237,9 @@ CREATE PROCEDURE spNuevoProducto(
     IN id_categoria INT)
 BEGIN
     INSERT INTO productos (nombre_producto, stock_actual, precio_lista, descuento_uno, 
-    descuento_dos, incremento, 
-    precio_final, id_categoria)
+    descuento_dos, incremento, precio_final, id_categoria)
     VALUES (nombre_producto, stock_actual, precio_lista, descuento_uno, 
-    descuento_dos, incremento, 
-    precio_final, id_categoria);
+    descuento_dos, incremento, precio_final, id_categoria);
 END //
 DELIMITER ;
 
