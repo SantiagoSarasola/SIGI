@@ -68,18 +68,13 @@ router.put(
     const stockActual = req.body.stockActual;
     const precioLista = req.body.precioLista;
     const descuentoUno = req.body.descuentoUno;
-    const costoIntermedio = req.body.costoIntermedio;
     const descuentoDos = req.body.descuentoDos;
-    const costoFinal = req.body.costoFinal;
     const incremento = req.body.incremento;
-    const precioSugerido = req.body.precioSugerido;
     const precioFinal = req.body.precioFinal;
-    const ganancia = req.body.ganancia;
     const idCategoria = req.body.idCategoria;
-    const idFabrica = req.body.idFabrica;
 
     const sql =
-      "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     try {
       await db.execute(sql, [
@@ -87,15 +82,10 @@ router.put(
         stockActual,
         precioLista,
         descuentoUno,
-        costoIntermedio,
         descuentoDos,
-        costoFinal,
         incremento,
-        precioSugerido,
         precioFinal,
-        ganancia,
         idCategoria,
-        idFabrica,
         id,
       ]);
 
@@ -106,15 +96,10 @@ router.put(
           stockActual,
           precioLista,
           descuentoUno,
-          costoIntermedio,
           descuentoDos,
-          costoFinal,
           incremento,
-          precioSugerido,
           precioFinal,
-          ganancia,
-          idCategoria,
-          idFabrica,
+          idCategoria
         },
       });
     } catch (error) {
@@ -135,33 +120,23 @@ router.post("/", validarAtributosProducto(), async (req, res) => {
   const stockActual = req.body.stockActual;
   const precioLista = req.body.precioLista;
   const descuentoUno = req.body.descuentoUno;
-  const costoIntermedio = req.body.costoIntermedio;
   const descuentoDos = req.body.descuentoDos;
-  const costoFinal = req.body.costoFinal;
   const incremento = req.body.incremento;
-  const precioSugerido = req.body.precioSugerido;
   const precioFinal = req.body.precioFinal;
-  const ganancia = req.body.ganancia;
   const idCategoria = req.body.idCategoria;
-  const idFabrica = req.body.idFabrica;
 
   try {
     await db.execute(
-      `CALL spNuevoProducto (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `CALL spNuevoProducto (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         nombreProducto,
         stockActual,
         precioLista,
         descuentoUno,
-        costoIntermedio,
         descuentoDos,
-        costoFinal,
         incremento,
-        precioSugerido,
         precioFinal,
-        ganancia,
         idCategoria,
-        idFabrica,
       ]
     );
 
