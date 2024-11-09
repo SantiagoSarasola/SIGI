@@ -82,7 +82,7 @@ router.put(
       "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     try {
-      await db.query(sql, [
+      await db.execute(sql, [
         nombreProducto,
         stockActual,
         precioLista,
@@ -184,7 +184,7 @@ router.delete("/:id", validarId(), async (req, res) => {
   const sql = "CALL spEliminarProducto(?)";
 
   try {
-    await db.query(sql, [id]);
+    await db.execute(sql, [id]);
     return res.status(200).send({ id });
   } catch (error) {
     console.error("Error al eliminar el producto: ", error.message);

@@ -2,7 +2,8 @@
 CREATE TABLE `categorias_producto` (
   `id_categoria` int NOT NULL AUTO_INCREMENT,
   `descripcion` varchar(50) NOT NULL,
-  PRIMARY KEY (`id_categoria`)
+  PRIMARY KEY (`id_categoria`),
+  `inhabilitado` BOOLEAN DEFAULT FALSE,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `fabricas` (
@@ -305,3 +306,45 @@ BEGIN
 END//
 DELIMITER ;
 
+-- SP CRUD CATEGORIAS
+-- GET ALL
+DELIMITER //
+CREATE PROCEDURE `spVerCategorias`()
+BEGIN
+	SELECT * FROM categorias_producto;
+END
+DELIMITER ;
+
+-- INSERT
+DELIMITER //
+CREATE PROCEDURE `spNuevaCategoria`(
+	IN descripcion VARCHAR(50)
+)
+BEGIN
+	INSERT INTO categorias_producto (descripcion)
+    VALUES (descripcion);
+END
+DELIMITER ;
+
+-- UPDATE
+DELIMITER //
+CREATE PROCEDURE `spModificarCategoria`(
+	IN idCategoria INT,
+    IN descripcion VARCHAR(50)
+)
+BEGIN
+		UPDATE categorias_producto
+        SET descripcion = descripcion
+        WHERE id_categoria = idCategoria;
+END
+DELIMITER ;
+
+-- SOFT DELETE
+DELIMITER //
+CREATE PROCEDURE `spEliminarCategoria`(
+	IN idCategoria INT
+)
+BEGIN
+	UPDATE categorias_producto SET inhabilitado = TRUE WHERE id_categoria = idCategoria;
+END
+DELIMITER ;
