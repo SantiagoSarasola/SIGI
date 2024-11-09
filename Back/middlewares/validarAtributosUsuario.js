@@ -8,8 +8,8 @@ const validarAtributosUsuario = () => [
         minUppercase:1,
         minNumbers:1,
         minSymbols:0
-    }).withMessage("El email debe contener al menos 8 caracteres, incluyendo 1 letra minuscula, 1 letra mayúscula y 1 número").bail().isLength({max : 60}),
-    body("idRol").notEmpty().withMessage("El id del rol no puede estar vacío").bail().isInt().withMessage("El id del rol debe ser un número entero").bail().custom((value) => value >= 0).withMessage("El id de la categoría no puede ser negativo").bail(),
+    }).withMessage("El email debe contener al menos 8 caracteres, incluyendo 1 letra minúscula, 1 letra mayúscula y 1 número").bail().isLength({max : 60}),
+    body("idRol").notEmpty().withMessage("El id del rol no puede estar vacío").bail().isInt().withMessage("El id del rol debe ser un número entero").bail().custom((value) => value >= 0).withMessage("El id del rol no puede ser negativo").bail()
 ];
 
 export default validarAtributosUsuario;
