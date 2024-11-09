@@ -212,8 +212,7 @@ DELIMITER //
 CREATE PROCEDURE spModificarProducto(
    IN nombreProducto VARCHAR(100), IN stockActual INT, IN precioLista DECIMAL(10,2), 
    IN descuentoUno DECIMAL(10,2), IN descuentoDos DECIMAL(10,2),
-   IN incremento DECIMAL(10,2),
-   IN precioFinal DECIMAL(10,2),
+   IN incremento DECIMAL(10,2), IN precioFinal DECIMAL(10,2),
    IN idCategoria INT, IN idProducto INT)
 BEGIN 
 		UPDATE productos 
@@ -238,11 +237,9 @@ CREATE PROCEDURE spNuevoProducto(
     IN id_categoria INT)
 BEGIN
     INSERT INTO productos (nombre_producto, stock_actual, precio_lista, descuento_uno, 
-    descuento_dos, incremento, 
-    precio_final, id_categoria)
+    descuento_dos, incremento, precio_final, id_categoria)
     VALUES (nombre_producto, stock_actual, precio_lista, descuento_uno, 
-    descuento_dos, incremento, 
-    precio_final, id_categoria);
+    descuento_dos, incremento, precio_final, id_categoria);
 END //
 DELIMITER ;
 

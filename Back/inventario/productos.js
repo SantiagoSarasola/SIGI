@@ -94,7 +94,7 @@ router.put(
     const idCategoria = req.body.idCategoria;
 
     const sql =
-      "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     try {
       await db.execute(sql, [
