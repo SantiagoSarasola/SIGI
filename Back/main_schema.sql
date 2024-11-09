@@ -1,4 +1,24 @@
 -- CREAR TABLAS
+
+CREATE TABLE `roles` (
+  `id_rol` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  PRIMARY KEY (`id_rol`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `usuarios` (
+  `id_usuario` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(50) NOT NULL,
+  `password` varchar(60) NOT NULL,
+  `id_rol` int NOT NULL,
+  `inhabilitado` BOOLEAN DEFAULT FALSE,
+  PRIMARY KEY (`id_usuario`),
+  UNIQUE KEY `email_UNIQUE` (`email`),
+  UNIQUE KEY `password_UNIQUE` (`password`),
+  KEY `id_rol` (`id_rol`),
+  CONSTRAINT `id_rol` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE `categorias_producto` (
   `id_categoria` int NOT NULL AUTO_INCREMENT,
   `descripcion` varchar(50) NOT NULL,
@@ -22,10 +42,14 @@ CREATE TABLE `productos` (
   `incremento` decimal(10,2) DEFAULT NULL,
   `precio_final` decimal(10,2) DEFAULT NULL,
   `id_categoria` int NOT NULL,
+  `modificado_por` int DEFAULT NULL,
+  `fecha_modificacion` datetime DEFAULT NULL,
+  `inhabilitado` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id_producto`),
-  `inhabilitado` BOOLEAN DEFAULT FALSE,
   KEY `id_categoria` (`id_categoria`),
-  CONSTRAINT `id_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categorias_producto` (`id_categoria`)
+  KEY `modificado_por` (`modificado_por`),
+  CONSTRAINT `id_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categorias_producto` (`id_categoria`),
+  CONSTRAINT `modificado_por` FOREIGN KEY (`modificado_por`) REFERENCES `usuarios` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `repartidores` (
@@ -33,25 +57,6 @@ CREATE TABLE `repartidores` (
   `nombre` varchar(50) NOT NULL,
   PRIMARY KEY (`id_repartidor`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-CREATE TABLE `roles` (
-  `id_rol` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(50) NOT NULL,
-  PRIMARY KEY (`id_rol`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-CREATE TABLE `usuarios` (
-  `id_usuario` int NOT NULL AUTO_INCREMENT,
-  `email` varchar(50) NOT NULL,
-  `password` varchar(60) NOT NULL,
-  `id_rol` int NOT NULL,
-  `inhabilitado` BOOLEAN DEFAULT FALSE,
-  PRIMARY KEY (`id_usuario`),
-  UNIQUE KEY `email_UNIQUE` (`email`),
-  UNIQUE KEY `password_UNIQUE` (`password`),
-  KEY `id_rol` (`id_rol`),
-  CONSTRAINT `id_rol` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `ventas` (
   `id_venta` int NOT NULL AUTO_INCREMENT,
@@ -213,13 +218,13 @@ CREATE PROCEDURE spModificarProducto(
    IN nombreProducto VARCHAR(100), IN stockActual INT, IN precioLista DECIMAL(10,2), 
    IN descuentoUno DECIMAL(10,2), IN descuentoDos DECIMAL(10,2),
    IN incremento DECIMAL(10,2), IN precioFinal DECIMAL(10,2),
-   IN idCategoria INT, IN idProducto INT)
+   IN idCategoria INT, IN modificadoPor INT, IN idProducto INT)
 BEGIN 
 		UPDATE productos 
         SET nombre_producto = nombreProducto, stock_actual = stockActual, precio_lista = precioLista, 
-        descuento_uno = descuentoUno, descuento_dos = descuentoDos, 
-        incremento = incremento,
-        precio_final = precioFinal, id_categoria = idCategoria
+        descuento_uno = descuentoUno, descuento_dos = descuentoDos, incremento = incremento,
+        precio_final = precioFinal, id_categoria = idCategoria,
+        modificado_por = modificadoPor, fecha_modificacion = CURRENT_TIMESTAMP()
     WHERE id_producto = idProducto;
 END//
 DELIMITER ;
@@ -234,7 +239,7 @@ CREATE PROCEDURE spNuevoProducto(
     IN descuento_dos DECIMAL(10, 2),
     IN incremento DECIMAL(10, 2),
     IN precio_final DECIMAL(10, 2),
-    IN id_categoria INT)
+    IN id_categoria INTO)
 BEGIN
     INSERT INTO productos (nombre_producto, stock_actual, precio_lista, descuento_uno, 
     descuento_dos, incremento, precio_final, id_categoria)

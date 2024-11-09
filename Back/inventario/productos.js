@@ -55,7 +55,7 @@ router.get("/:id", validarId(), async (req, res) => {
 router.put(
   "/:id",
   validarId(),
-  validarAtributosProducto(),
+  validarAtributosProducto("PUT"),
   async (req, res) => {
     const validacion = validationResult(req);
     if (!validacion.isEmpty()) {
@@ -72,9 +72,10 @@ router.put(
     const incremento = req.body.incremento;
     const precioFinal = req.body.precioFinal;
     const idCategoria = req.body.idCategoria;
+    const modificadoPor = req.body.modificadoPor;
 
     const sql =
-      "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     try {
       await db.execute(sql, [
@@ -86,7 +87,8 @@ router.put(
         incremento,
         precioFinal,
         idCategoria,
-        id,
+        modificadoPor,
+        id
       ]);
 
       return res.status(200).send({
@@ -99,7 +101,8 @@ router.put(
           descuentoDos,
           incremento,
           precioFinal,
-          idCategoria
+          idCategoria,
+          modificadoPor
         },
       });
     } catch (error) {
@@ -109,7 +112,7 @@ router.put(
   }
 );
 
-router.post("/", validarAtributosProducto(), async (req, res) => {
+router.post("/", validarAtributosProducto("POST"), async (req, res) => {
   const validacion = validationResult(req);
   if (!validacion.isEmpty()) {
     res.status(400).send({ errores: validacion.array() });
@@ -136,7 +139,7 @@ router.post("/", validarAtributosProducto(), async (req, res) => {
         descuentoDos,
         incremento,
         precioFinal,
-        idCategoria,
+        idCategoria
       ]
     );
 
