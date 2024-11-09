@@ -3,48 +3,13 @@ CREATE TABLE `categorias_producto` (
   `id_categoria` int NOT NULL AUTO_INCREMENT,
   `descripcion` varchar(50) NOT NULL,
   PRIMARY KEY (`id_categoria`),
-  `inhabilitado` BOOLEAN DEFAULT FALSE,
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-CREATE TABLE `fabricas` (
-  `id_fabrica` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(50) NOT NULL,
-  PRIMARY KEY (`id_fabrica`)
+  `inhabilitado` BOOLEAN DEFAULT FALSE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `formas_pago` (
   `id_forma_pago` int NOT NULL AUTO_INCREMENT,
   `descripcion` varchar(50) NOT NULL,
   PRIMARY KEY (`id_forma_pago`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-CREATE TABLE `productos` (
-  `id_producto` int NOT NULL AUTO_INCREMENT,
-  `nombre_producto` varchar(100) NOT NULL,
-  `stock_actual` int NOT NULL,
-  `precio_lista` decimal(10,2) DEFAULT NULL,
-  `descuento_uno` decimal(10,2) DEFAULT NULL,
-  `costo_intermedio` decimal(10,2) DEFAULT NULL,
-  `descuento_dos` decimal(10,2) DEFAULT NULL,
-  `costo_final` decimal(10,2) DEFAULT NULL,
-  `incremento` decimal(10,2) DEFAULT NULL,
-  `precio_sugerido` decimal(10,2) DEFAULT NULL,
-  `precio_final` decimal(10,2) DEFAULT NULL,
-  `ganancia` decimal(10,2) DEFAULT NULL,
-  `id_categoria` int NOT NULL,
-  `id_fabrica` int NOT NULL,
-  PRIMARY KEY (`id_producto`),
-  `inhabilitado` BOOLEAN DEFAULT FALSE,
-  KEY `id_categoria` (`id_categoria`),
-  KEY `id_fabrica` (`id_fabrica`),
-  CONSTRAINT `id_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categorias_producto` (`id_categoria`),
-  CONSTRAINT `id_fabrica` FOREIGN KEY (`id_fabrica`) REFERENCES `fabricas` (`id_fabrica`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-CREATE TABLE `repartidores` (
-  `id_repartidor` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(50) NOT NULL,
-  PRIMARY KEY (`id_repartidor`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `roles` (
@@ -65,6 +30,32 @@ CREATE TABLE `usuarios` (
   KEY `id_rol` (`id_rol`),
   CONSTRAINT `id_rol` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `productos` (
+  `id_producto` int NOT NULL AUTO_INCREMENT,
+  `nombre_producto` varchar(100) NOT NULL,
+  `stock_actual` int NOT NULL,
+  `precio_lista` decimal(10,2) DEFAULT NULL,
+  `descuento_uno` decimal(10,2) DEFAULT NULL,
+  `descuento_dos` decimal(10,2) DEFAULT NULL,
+  `incremento` decimal(10,2) DEFAULT NULL,
+  `precio_final` decimal(10,2) DEFAULT NULL,
+  `id_categoria` int NOT NULL,
+  `inhabilitado` tinyint(1) DEFAULT '0',
+  `ultima_fecha_modificacion` datetime DEFAULT NULL,
+  `modificado_por` int DEFAULT NULL,
+  PRIMARY KEY (`id_producto`),
+  KEY `id_categoria` (`id_categoria`),
+  KEY `modificado_por` (`modificado_por`),
+  CONSTRAINT `id_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categorias_producto` (`id_categoria`),
+  CONSTRAINT `modificado_por` FOREIGN KEY (`modificado_por`) REFERENCES `usuarios` (`id_usuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `repartidores` (
+  `id_repartidor` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  PRIMARY KEY (`id_repartidor`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `ventas` (
   `id_venta` int NOT NULL AUTO_INCREMENT,
@@ -101,20 +92,15 @@ INSERT INTO categorias_producto (descripcion) VALUES
 ('Ropa'),
 ('Juguetes');
 
-INSERT INTO fabricas (nombre) VALUES
-('Fabrica Uno'),
-('Fabrica Dos'),
-('Fabrica Tres');
-
 INSERT INTO formas_pago (descripcion) VALUES
 ('Efectivo'),
 ('Tarjeta de Crédito'),
 ('Transferencia Bancaria');
 
-INSERT INTO productos (nombre_producto, stock_actual, precio_lista, descuento_uno, costo_intermedio, descuento_dos, costo_final, incremento, precio_sugerido, precio_final, ganancia, id_categoria, id_fabrica) VALUES
-('Alimento Gato 1Kg', 100, 1500.00, 10.00, 1350.00, 5.00, 1282.50, 15.00, 1450.00, 1600.00, 200.00, 1, 1),
-('Chaleco Perro', 200, 50.00, 5.00, 47.50, 2.00, 46.55, 10.00, 48.00, 52.00, 5.45, 2, 2),
-('Muñeco Perro', 150, 30.00, 5.00, 28.50, 3.00, 27.65, 8.00, 32.00, 33.00, 4.50, 3, 3);
+INSERT INTO productos (nombre_producto, stock_actual, precio_lista, descuento_uno, descuento_dos, incremento, precio_final, id_categoria) VALUES
+('Alimento Gato 1Kg', 100, 1500.00, 10.00, 5.00, 15.00, 1600.00, 1),
+('Chaleco Perro', 200, 50.00, 5.00, 2.00, 10.00, 52.00, 2),
+('Muñeco Perro', 150, 30.00, 5.00, 3.00, 8.00, 33.00, 3);
 
 INSERT INTO repartidores (nombre) VALUES
 ('Juan Pérez'),
@@ -210,10 +196,8 @@ BEGIN
             p.precio_lista,
             p.descuento_uno,
             p.descuento_dos,
-            p.costo_final,
             p.incremento,
             p.precio_final,
-            p.ganancia,
             c.descripcion AS categoria
         FROM productos AS p
         JOIN categorias_producto AS c ON p.id_categoria = c.id_categoria
@@ -231,16 +215,17 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE spModificarProducto(
    IN nombreProducto VARCHAR(100), IN stockActual INT, IN precioLista DECIMAL(10,2), 
-   IN descuentoUno DECIMAL(10,2), IN costoIntermedio DECIMAL(10,2), IN descuentoDos DECIMAL(10,2),
-   IN costoFinal DECIMAL(10,2), IN incremento DECIMAL(10,2), IN precioSugerido DECIMAL(10,2),
-   IN precioFinal DECIMAL(10,2), IN ganancia DECIMAL(10,2), 
-   IN idCategoria INT, IN idFabrica INT, IN idProducto INT)
+   IN descuentoUno DECIMAL(10,2), IN descuentoDos DECIMAL(10,2),
+   IN incremento DECIMAL(10,2),
+   IN precioFinal DECIMAL(10,2),
+   IN idCategoria INT, IN modificadoPor INT, IN idProducto INT)
 BEGIN 
 		UPDATE productos 
         SET nombre_producto = nombreProducto, stock_actual = stockActual, precio_lista = precioLista, 
-        descuento_uno = descuentoUno, costo_intermedio = costoIntermedio, descuento_dos = descuentoDos, 
-        costo_final = costoFinal, incremento = incremento, precio_sugerido = precioSugerido, 
-        precio_final = precioFinal, ganancia = ganancia, id_categoria = idCategoria, id_fabrica = idFabrica
+        descuento_uno = descuentoUno, descuento_dos = descuentoDos, 
+		    incremento = incremento,
+        precio_final = precioFinal, id_categoria = idCategoria,
+        modificado_por = modificadoPor, ultima_fecha_modificacion = CURRENT_TIMESTAMP()
     WHERE id_producto = idProducto;
 END//
 DELIMITER ;
@@ -252,23 +237,17 @@ CREATE PROCEDURE spNuevoProducto(
     IN stock_actual INT,
     IN precio_lista DECIMAL(10, 2),
     IN descuento_uno DECIMAL(10, 2),
-    IN costo_intermedio DECIMAL(10, 2),
     IN descuento_dos DECIMAL(10, 2),
-    IN costo_final DECIMAL(10, 2),
     IN incremento DECIMAL(10, 2),
-    IN precio_sugerido DECIMAL(10, 2),
     IN precio_final DECIMAL(10, 2),
-    IN ganancia DECIMAL(10, 2),
-    IN id_categoria INT,
-    IN id_fabrica INT
-)
+    IN id_categoria INT)
 BEGIN
     INSERT INTO productos (nombre_producto, stock_actual, precio_lista, descuento_uno, 
-    costo_intermedio, descuento_dos, costo_final, incremento, precio_sugerido, 
-    precio_final, ganancia, id_categoria, id_fabrica)
+    descuento_dos, incremento, 
+    precio_final, id_categoria)
     VALUES (nombre_producto, stock_actual, precio_lista, descuento_uno, 
-    costo_intermedio, descuento_dos, costo_final, incremento, precio_sugerido, 
-    precio_final, ganancia, id_categoria, id_fabrica);
+    descuento_dos, incremento, 
+    precio_final, id_categoria);
 END //
 DELIMITER ;
 

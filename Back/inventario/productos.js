@@ -68,18 +68,14 @@ router.put(
     const stockActual = req.body.stockActual;
     const precioLista = req.body.precioLista;
     const descuentoUno = req.body.descuentoUno;
-    const costoIntermedio = req.body.costoIntermedio;
     const descuentoDos = req.body.descuentoDos;
-    const costoFinal = req.body.costoFinal;
     const incremento = req.body.incremento;
-    const precioSugerido = req.body.precioSugerido;
     const precioFinal = req.body.precioFinal;
-    const ganancia = req.body.ganancia;
     const idCategoria = req.body.idCategoria;
-    const idFabrica = req.body.idFabrica;
+    const modificadoPor = req.body.modificadoPor;
 
     const sql =
-      "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     try {
       await db.execute(sql, [
@@ -87,15 +83,11 @@ router.put(
         stockActual,
         precioLista,
         descuentoUno,
-        costoIntermedio,
         descuentoDos,
-        costoFinal,
         incremento,
-        precioSugerido,
         precioFinal,
-        ganancia,
         idCategoria,
-        idFabrica,
+        modificadoPor,
         id,
       ]);
 
@@ -106,15 +98,11 @@ router.put(
           stockActual,
           precioLista,
           descuentoUno,
-          costoIntermedio,
           descuentoDos,
-          costoFinal,
           incremento,
-          precioSugerido,
           precioFinal,
-          ganancia,
           idCategoria,
-          idFabrica,
+          modificadoPor
         },
       });
     } catch (error) {
