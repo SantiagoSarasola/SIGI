@@ -40,8 +40,29 @@ function Productos() {
     alert(`aca tengo que ver la pagina de detalle:${id}`);
   };
 
-  const handleBorrar = (id) => {
-    alert(`Borrar producto con ID: ${id}`);
+  const handleBorrar = async (id) => {
+    const confirmar = window.confirm(`¿Estás seguro de que deseas eliminar el producto con ID: ${id}?`);
+    if (!confirmar) return;
+  
+    try {
+      const respuesta = await fetch(`http://localhost:3000/productos/${id}`, {
+        method: 'DELETE',
+      });
+  
+      if (respuesta.ok) {
+        const resultado = await respuesta.json();
+        alert(`Producto con ID ${resultado.id} eliminado correctamente`);
+  
+        setProductos((prevProductos) => prevProductos.filter((producto) => producto.id_producto !== id));
+        setProductosOriginales((prevProductos) => prevProductos.filter((producto) => producto.id_producto !== id));
+      } else {
+        const error = await respuesta.json();
+        alert(`No se pudo eliminar el producto: ${error.error || "Error desconocido"}`);
+      }
+    } catch (error) {
+      console.error("Error al intentar eliminar el producto: ", error);
+      alert("Error al intentar eliminar el producto");
+    }
   };
 
   const handleAgregar = () => {
