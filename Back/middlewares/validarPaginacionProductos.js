@@ -30,6 +30,12 @@ const validarPaginacionProductos = () => [
     .isString()
     .isIn(["asc", "desc", "ASC", "DESC"])
     .withMessage("El order debe ser 'asc', 'desc', 'ASC' o 'DESC'."),
+
+  query("search")
+    .optional()
+    .isString()
+    .isLength({ max: 100 })
+    .withMessage("El search debe ser una cadena de texto con un máximo de 100 caracteres."),
 ];
 
 export default validarPaginacionProductos;

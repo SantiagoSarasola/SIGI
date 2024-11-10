@@ -7,25 +7,35 @@ import { validationResult } from "express-validator";
 const router = express.Router();
 
 router.get("/", validarPaginacionProductos(), async (req, res) => {
-  const {
-    offset = 0,
-    limit = 10,
-    sort = "nombre_producto",
-    order = "ASC",
-  } = req.query;
+  const { offset = 0, limit = 10, sort = "nombre_producto", order = "ASC", search = "" } = req.query;
 
-  const validacion = validationResult(req);
-  if (!validacion.isEmpty()) {
-    return res.status(400).send({ errores: validacion.array() });
-  }
+  const sqlProductos = `
+    SELECT * 
+    FROM productos 
+    WHERE inhabilitado = FALSE 
+    AND nombre_producto LIKE ?
+    ORDER BY ${sort} ${order}
+    LIMIT ? OFFSET ?;
+  `;
+
+  const sqlTotal = `
+    SELECT COUNT(*) AS total 
+    FROM productos 
+    WHERE inhabilitado = FALSE 
+    AND nombre_producto LIKE ?;
+  `;
 
   try {
-    const sql = "CALL spVerProductos(?, ?, ?, ?)";
-    const [productos] = await db.execute(sql, [offset, limit, sort, order]);
+    const [productos] = await db.query(sqlProductos, [`%${search}%`, limit, offset]);
+    const [total] = await db.query(sqlTotal, [`%${search}%`]);
 
-    return res.status(200).send({ productos: productos[0] });
+    return res.status(200).send({
+      productos,
+      total: total[0].total,
+    });
   } catch (error) {
-    return res.status(500).send({ error: "Error al traer productos" });
+    console.error("Error al obtener los productos:", error.message);
+    return res.status(500).send({ error: "Error al obtener los productos" });
   }
 });
 
@@ -55,7 +65,7 @@ router.get("/:id", validarId(), async (req, res) => {
 router.put(
   "/:id",
   validarId(),
-  validarAtributosProducto(),
+  validarAtributosProducto("PUT"),
   async (req, res) => {
     const validacion = validationResult(req);
     if (!validacion.isEmpty()) {
@@ -68,18 +78,14 @@ router.put(
     const stockActual = req.body.stockActual;
     const precioLista = req.body.precioLista;
     const descuentoUno = req.body.descuentoUno;
-    const costoIntermedio = req.body.costoIntermedio;
     const descuentoDos = req.body.descuentoDos;
-    const costoFinal = req.body.costoFinal;
     const incremento = req.body.incremento;
-    const precioSugerido = req.body.precioSugerido;
     const precioFinal = req.body.precioFinal;
-    const ganancia = req.body.ganancia;
     const idCategoria = req.body.idCategoria;
-    const idFabrica = req.body.idFabrica;
+    const modificadoPor = req.body.modificadoPor;
 
     const sql =
-      "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     try {
       await db.execute(sql, [
@@ -87,16 +93,12 @@ router.put(
         stockActual,
         precioLista,
         descuentoUno,
-        costoIntermedio,
         descuentoDos,
-        costoFinal,
         incremento,
-        precioSugerido,
         precioFinal,
-        ganancia,
         idCategoria,
-        idFabrica,
-        id,
+        modificadoPor,
+        id
       ]);
 
       return res.status(200).send({
@@ -106,15 +108,11 @@ router.put(
           stockActual,
           precioLista,
           descuentoUno,
-          costoIntermedio,
           descuentoDos,
-          costoFinal,
           incremento,
-          precioSugerido,
           precioFinal,
-          ganancia,
           idCategoria,
-          idFabrica,
+          modificadoPor
         },
       });
     } catch (error) {
@@ -124,7 +122,7 @@ router.put(
   }
 );
 
-router.post("/", validarAtributosProducto(), async (req, res) => {
+router.post("/", validarAtributosProducto("POST"), async (req, res) => {
   const validacion = validationResult(req);
   if (!validacion.isEmpty()) {
     res.status(400).send({ errores: validacion.array() });
@@ -135,33 +133,23 @@ router.post("/", validarAtributosProducto(), async (req, res) => {
   const stockActual = req.body.stockActual;
   const precioLista = req.body.precioLista;
   const descuentoUno = req.body.descuentoUno;
-  const costoIntermedio = req.body.costoIntermedio;
   const descuentoDos = req.body.descuentoDos;
-  const costoFinal = req.body.costoFinal;
   const incremento = req.body.incremento;
-  const precioSugerido = req.body.precioSugerido;
   const precioFinal = req.body.precioFinal;
-  const ganancia = req.body.ganancia;
   const idCategoria = req.body.idCategoria;
-  const idFabrica = req.body.idFabrica;
 
   try {
     await db.execute(
-      `CALL spNuevoProducto (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `CALL spNuevoProducto (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         nombreProducto,
         stockActual,
         precioLista,
         descuentoUno,
-        costoIntermedio,
         descuentoDos,
-        costoFinal,
         incremento,
-        precioSugerido,
         precioFinal,
-        ganancia,
-        idCategoria,
-        idFabrica,
+        idCategoria
       ]
     );
 
