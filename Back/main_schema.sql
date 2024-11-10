@@ -239,7 +239,7 @@ CREATE PROCEDURE spNuevoProducto(
     IN descuento_dos DECIMAL(10, 2),
     IN incremento DECIMAL(10, 2),
     IN precio_final DECIMAL(10, 2),
-    IN id_categoria INTO)
+    IN id_categoria INT)
 BEGIN
     INSERT INTO productos (nombre_producto, stock_actual, precio_lista, descuento_uno, 
     descuento_dos, incremento, precio_final, id_categoria)
@@ -288,7 +288,7 @@ DELIMITER //
 CREATE PROCEDURE `spVerCategorias`()
 BEGIN
 	SELECT * FROM categorias_producto;
-END
+END//
 DELIMITER ;
 
 -- INSERT
@@ -299,7 +299,7 @@ CREATE PROCEDURE `spNuevaCategoria`(
 BEGIN
 	INSERT INTO categorias_producto (descripcion)
     VALUES (descripcion);
-END
+END//
 DELIMITER ;
 
 -- UPDATE
@@ -312,7 +312,7 @@ BEGIN
 		UPDATE categorias_producto
         SET descripcion = descripcion
         WHERE id_categoria = idCategoria;
-END
+END//
 DELIMITER ;
 
 -- SOFT DELETE
@@ -322,5 +322,5 @@ CREATE PROCEDURE `spEliminarCategoria`(
 )
 BEGIN
 	UPDATE categorias_producto SET inhabilitado = TRUE WHERE id_categoria = idCategoria;
-END
+END//
 DELIMITER ;
