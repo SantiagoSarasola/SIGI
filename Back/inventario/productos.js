@@ -7,25 +7,35 @@ import { validationResult } from "express-validator";
 const router = express.Router();
 
 router.get("/", validarPaginacionProductos(), async (req, res) => {
-  const {
-    offset = 0,
-    limit = 10,
-    sort = "nombre_producto",
-    order = "ASC",
-  } = req.query;
+  const { offset = 0, limit = 10, sort = "nombre_producto", order = "ASC", search = "" } = req.query;
 
-  const validacion = validationResult(req);
-  if (!validacion.isEmpty()) {
-    return res.status(400).send({ errores: validacion.array() });
-  }
+  const sqlProductos = `
+    SELECT * 
+    FROM productos 
+    WHERE inhabilitado = FALSE 
+    AND nombre_producto LIKE ?
+    ORDER BY ${sort} ${order}
+    LIMIT ? OFFSET ?;
+  `;
+
+  const sqlTotal = `
+    SELECT COUNT(*) AS total 
+    FROM productos 
+    WHERE inhabilitado = FALSE 
+    AND nombre_producto LIKE ?;
+  `;
 
   try {
-    const sql = "CALL spVerProductos(?, ?, ?, ?)";
-    const [productos] = await db.execute(sql, [offset, limit, sort, order]);
+    const [productos] = await db.query(sqlProductos, [`%${search}%`, limit, offset]);
+    const [total] = await db.query(sqlTotal, [`%${search}%`]);
 
-    return res.status(200).send({ productos: productos[0] });
+    return res.status(200).send({
+      productos,
+      total: total[0].total,
+    });
   } catch (error) {
-    return res.status(500).send({ error: "Error al traer productos" });
+    console.error("Error al obtener los productos:", error.message);
+    return res.status(500).send({ error: "Error al obtener los productos" });
   }
 });
 
