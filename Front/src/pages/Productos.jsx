@@ -26,19 +26,20 @@ function Productos() {
         const resultado = await fetch(
           `http://localhost:3000/productos?offset=${
             (paginaActual - 1) * limite
-          }&limit=${limite}&sort=${sort}&order=${order}`
+          }&limit=${limite}&sort=${sort}&order=${order}&search=${terminoBusqueda}`
         );
         const data = await resultado.json();
-        setProductos(data.productos);
-        setProductosOriginales(data.productos);
-        setTotalProductos(data.total); // Total enviado desde el backend
+  
+        setProductos(data.productos); // Actualiza los productos visibles
+        setTotalProductos(data.total || 0); // Actualiza el total de productos desde el backend
       } catch (error) {
+        console.error("Error al obtener los productos:", error);
         alert("No se pudo obtener los productos");
       }
     };
-
+  
     traerProductos();
-  }, [paginaActual, limite, sort, order]);
+  }, [paginaActual, limite, sort, order, terminoBusqueda]);
 
   // Filtrar productos por búsqueda
   useEffect(() => {
@@ -147,13 +148,13 @@ function Productos() {
               <th></th>
               <th></th>
               <th>
-                <input
-                  className="textBox"
-                  type="text"
-                  value={terminoBusqueda}
-                  onChange={(e) => setTerminoBusqueda(e.target.value)}
-                  placeholder="Buscar por nombre"
-                />
+              <input
+                className="textBox"
+                type="text"
+                value={terminoBusqueda}
+                onChange={(e) => setTerminoBusqueda(e.target.value)}
+                placeholder="Buscar por nombre"
+              />
               </th>
               <th></th>
               <th></th>
