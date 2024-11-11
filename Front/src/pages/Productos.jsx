@@ -15,11 +15,12 @@ function Productos() {
   const [limite, setLimite] = useState(10);
   const [totalProductos, setTotalProductos] = useState(0);
 
-  
   const totalPaginas = Math.ceil(totalProductos / limite);
-  const registrosInicio = totalProductos > 0 ? (paginaActual - 1) * limite + 1 : 0;
-  const registrosFin = totalProductos > 0 ? Math.min(paginaActual * limite, totalProductos) : 0;
-  
+  const registrosInicio =
+    totalProductos > 0 ? (paginaActual - 1) * limite + 1 : 0;
+  const registrosFin =
+    totalProductos > 0 ? Math.min(paginaActual * limite, totalProductos) : 0;
+
   useEffect(() => {
     const traerProductos = async () => {
       try {
@@ -29,32 +30,36 @@ function Productos() {
           }&limit=${limite}&sort=${sort}&order=${order}&search=${terminoBusqueda}`
         );
         const data = await resultado.json();
-  
+
         setProductos(data.productos); // Actualiza los productos visibles
-        setTotalProductos(data.total || 0); // Actualiza el total de productos desde el backend
+        setTotalProductos(data.paginacion.total || 0); // Actualiza el total de productos desde el backend
       } catch (error) {
         console.error("Error al obtener los productos:", error);
         alert("No se pudo obtener los productos");
       }
     };
-  
+
     traerProductos();
   }, [paginaActual, limite, sort, order, terminoBusqueda]);
 
   // Filtrar productos por búsqueda
-  useEffect(() => {
-    const productosFiltrados = productosOriginales.filter((producto) =>
-      producto.nombre_producto.toLowerCase().includes(terminoBusqueda.toLowerCase())
-    );
-    setProductos(productosFiltrados);
-  }, [terminoBusqueda, productosOriginales]);
+  // useEffect(() => {
+  //   const productosFiltrados = productosOriginales.filter((producto) =>
+  //     producto.nombre_producto
+  //       .toLowerCase()
+  //       .includes(terminoBusqueda.toLowerCase())
+  //   );
+  //   setProductos(productosFiltrados);
+  // }, [terminoBusqueda, productosOriginales]);
 
   const handleVerDetalles = (id) => {
     alert(`Ver detalles del producto con ID: ${id}`);
   };
 
   const handleBorrar = async (id) => {
-    const confirmar = window.confirm(`¿Estás seguro de que deseas eliminar el producto con ID: ${id}?`);
+    const confirmar = window.confirm(
+      `¿Estás seguro de que deseas eliminar el producto con ID: ${id}?`
+    );
     if (!confirmar) return;
 
     try {
@@ -70,12 +75,16 @@ function Productos() {
         setProductos((prevProductos) =>
           prevProductos.filter((producto) => producto.id_producto !== id)
         );
-        setProductosOriginales((prevProductos) =>
-          prevProductos.filter((producto) => producto.id_producto !== id)
-        );
+        // setProductosOriginales((prevProductos) =>
+        //   prevProductos.filter((producto) => producto.id_producto !== id)
+        // );
       } else {
         const error = await respuesta.json();
-        alert(`No se pudo eliminar el producto: ${error.error || "Error desconocido"}`);
+        alert(
+          `No se pudo eliminar el producto: ${
+            error.error || "Error desconocido"
+          }`
+        );
       }
     } catch (error) {
       console.error("Error al intentar eliminar el producto:", error);
@@ -148,13 +157,13 @@ function Productos() {
               <th></th>
               <th></th>
               <th>
-              <input
-                className="textBox"
-                type="text"
-                value={terminoBusqueda}
-                onChange={(e) => setTerminoBusqueda(e.target.value)}
-                placeholder="Buscar por nombre"
-              />
+                <input
+                  className="textBox"
+                  type="text"
+                  value={terminoBusqueda}
+                  onChange={(e) => setTerminoBusqueda(e.target.value)}
+                  placeholder="Buscar por nombre"
+                />
               </th>
               <th></th>
               <th></th>

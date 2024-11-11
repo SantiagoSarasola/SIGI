@@ -31,8 +31,8 @@ router.get("/", validarPaginacionProductos(), async (req, res) => {
     ]);
 
     const sqlTotalProductos =
-      "SELECT COUNT(*) AS total FROM productos WHERE inhabilitado = FALSE";
-    const [total] = await db.execute(sqlTotalProductos);
+      "SELECT COUNT(*) AS total FROM productos WHERE inhabilitado = FALSE AND nombre_producto LIKE ?;";
+    const [total] = await db.execute(sqlTotalProductos, [`%${search}%`]);
 
     return res
       .status(200)
