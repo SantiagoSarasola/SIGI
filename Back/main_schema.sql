@@ -85,16 +85,12 @@ CREATE TABLE `ventas` (
   `id_venta` int NOT NULL AUTO_INCREMENT,
   `fecha` date NOT NULL,
   `precio_delivery` decimal(10,2) NOT NULL,
-  `id_repartidor` int NOT NULL,
   `total_venta` decimal(10,2) DEFAULT NULL,
   `id_forma_pago` int NOT NULL,
-  `entregado` tinyint DEFAULT NULL,
   `facturado` tinyint DEFAULT NULL,
   PRIMARY KEY (`id_venta`),
-  KEY `id_repartidor` (`id_repartidor`),
   KEY `id_forma_pago` (`id_forma_pago`),
-  CONSTRAINT `id_forma_pago` FOREIGN KEY (`id_forma_pago`) REFERENCES `formas_pago` (`id_forma_pago`),
-  CONSTRAINT `id_repartidor` FOREIGN KEY (`id_repartidor`) REFERENCES `repartidores` (`id_repartidor`)
+  CONSTRAINT `id_forma_pago` FOREIGN KEY (`id_forma_pago`) REFERENCES `formas_pago` (`id_forma_pago`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `ventas_producto` (
@@ -141,10 +137,10 @@ INSERT INTO usuarios (email, password, id_rol) VALUES
 ('vendedor@example.com', 'password456', 2),
 ('cliente@example.com', 'password789', 3);
 
-INSERT INTO ventas (fecha, precio_delivery, id_repartidor, total_venta, id_forma_pago, entregado, facturado) VALUES
-('2024-10-01', 50.00, 1, 1650.00, 2, 1, 1),
-('2024-10-02', 20.00, 2, 60.00, 1, 0, 1),
-('2024-10-03', 30.00, 3, 300.00, 3, 1, 0);
+INSERT INTO ventas (fecha, precio_delivery, total_venta, id_forma_pago, facturado) VALUES
+('2024-10-01', 50.00, 1650.00, 2, 1),
+('2024-10-02', 20.00, 60.00, 1, 1),
+('2024-10-03', 30.00, 300.00, 3, 0);
 
 INSERT INTO ventas_producto (id_venta, id_producto, cantidad, subtotal_venta) VALUES
 (1, 1, 1, 1600.00),
