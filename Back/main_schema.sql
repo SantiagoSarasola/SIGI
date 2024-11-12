@@ -1,7 +1,6 @@
 -- DROPEAR TABLAS Y SPs
 DROP TABLE IF EXISTS ventas_producto;
 DROP TABLE IF EXISTS ventas;
-DROP TABLE IF EXISTS repartidores;
 DROP TABLE IF EXISTS productos;
 DROP TABLE IF EXISTS formas_pago;
 DROP TABLE IF EXISTS categorias_producto;
@@ -75,12 +74,6 @@ CREATE TABLE `productos` (
   CONSTRAINT `modificado_por` FOREIGN KEY (`modificado_por`) REFERENCES `usuarios` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `repartidores` (
-  `id_repartidor` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(50) NOT NULL,
-  PRIMARY KEY (`id_repartidor`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 CREATE TABLE `ventas` (
   `id_venta` int NOT NULL AUTO_INCREMENT,
   `fecha` date NOT NULL,
@@ -121,11 +114,6 @@ INSERT INTO productos (nombre_producto, stock_actual, precio_lista, descuento_un
 ('Alimento Gato 1Kg', 100, 1500.00, 10.00, 5.00, 15.00, 1600.00, 1),
 ('Chaleco Perro', 200, 50.00, 5.00, 2.00, 10.00, 52.00, 2),
 ('Muñeco Perro', 150, 30.00, 5.00, 3.00, 8.00, 33.00, 3);
-
-INSERT INTO repartidores (nombre) VALUES
-('Juan Pérez'),
-('María López'),
-('Carlos Gómez');
 
 INSERT INTO roles (nombre) VALUES
 ('Administrador'),
