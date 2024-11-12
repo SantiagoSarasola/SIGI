@@ -1,3 +1,26 @@
+-- DROPEAR TABLAS Y SPs
+DROP TABLE IF EXISTS ventas_producto;
+DROP TABLE IF EXISTS ventas;
+DROP TABLE IF EXISTS repartidores;
+DROP TABLE IF EXISTS productos;
+DROP TABLE IF EXISTS formas_pago;
+DROP TABLE IF EXISTS categorias_producto;
+DROP TABLE IF EXISTS usuarios;
+DROP TABLE IF EXISTS roles;
+
+DROP PROCEDURE IF EXISTS spVerProductos;
+DROP PROCEDURE IF EXISTS spVerProductoPorId;
+DROP PROCEDURE IF EXISTS spModificarProducto;
+DROP PROCEDURE IF EXISTS spNuevoProducto;
+DROP PROCEDURE IF EXISTS spEliminarProducto;
+DROP PROCEDURE IF EXISTS spVerUsuarios;
+DROP PROCEDURE IF EXISTS spNuevoUsuario;
+DROP PROCEDURE IF EXISTS spEliminarUsuario;
+DROP PROCEDURE IF EXISTS spVerCategorias;
+DROP PROCEDURE IF EXISTS spNuevaCategoria;
+DROP PROCEDURE IF EXISTS spModificarCategoria;
+DROP PROCEDURE IF EXISTS spEliminarCategoria;
+
 -- CREAR TABLAS
 
 CREATE TABLE `roles` (
@@ -135,7 +158,8 @@ CREATE PROCEDURE spVerProductos(
 	  IN filaInicial INT, 
     IN limite INT, 
     IN colOrden VARCHAR(50), 
-    IN dirOrden VARCHAR(4)
+    IN dirOrden VARCHAR(4),
+    IN busqueda VARCHAR(100)
     )
 BEGIN
 	  DECLARE colValida VARCHAR(50);
@@ -144,6 +168,7 @@ BEGIN
     -- Elige un valor predeterminado si no hay valor de entrada
     SET limite = IFNULL(limite, 10);
     SET filaInicial = IFNULL(filaInicial, 0);
+    SET busqueda = IFNULL(busqueda, '');
 
     -- Validar columna de ordenamiento
     SET colValida = CASE 
@@ -163,7 +188,7 @@ BEGIN
     END;
 
     SET @consulta = CONCAT('
-        SELECT 
+        SELECT
             p.id_producto,
             p.nombre_producto,
             p.precio_lista,
@@ -173,6 +198,7 @@ BEGIN
         FROM productos AS p
         JOIN categorias_producto AS c ON p.id_categoria = c.id_categoria
         WHERE p.inhabilitado = 0
+        AND p.nombre_producto LIKE "%', busqueda, '%"
         ORDER BY ', colValida, ' ', dirValida, '
         LIMIT ', filaInicial, ', ', limite
         );

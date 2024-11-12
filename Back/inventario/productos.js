@@ -7,35 +7,38 @@ import { validationResult } from "express-validator";
 const router = express.Router();
 
 router.get("/", validarPaginacionProductos(), async (req, res) => {
-  const { offset = 0, limit = 10, sort = "nombre_producto", order = "ASC", search = "" } = req.query;
+  const {
+    offset = 0,
+    limit = 10,
+    sort = "nombre_producto",
+    order = "ASC",
+    search = "",
+  } = req.query;
 
-  const sqlProductos = `
-    SELECT * 
-    FROM productos 
-    WHERE inhabilitado = FALSE 
-    AND nombre_producto LIKE ?
-    ORDER BY ${sort} ${order}
-    LIMIT ? OFFSET ?;
-  `;
-
-  const sqlTotal = `
-    SELECT COUNT(*) AS total 
-    FROM productos 
-    WHERE inhabilitado = FALSE 
-    AND nombre_producto LIKE ?;
-  `;
+  const validacion = validationResult(req);
+  if (!validacion.isEmpty()) {
+    return res.status(400).send({ errores: validacion.array() });
+  }
 
   try {
-    const [productos] = await db.query(sqlProductos, [`%${search}%`, limit, offset]);
-    const [total] = await db.query(sqlTotal, [`%${search}%`]);
+    const sqlFetchProductos = "CALL spVerProductos(?, ?, ?, ?,?)";
+    const [productos] = await db.execute(sqlFetchProductos, [
+      offset,
+      limit,
+      sort,
+      order,
+      search,
+    ]);
 
-    return res.status(200).send({
-      productos,
-      total: total[0].total,
-    });
+    const sqlTotalProductos =
+      "SELECT COUNT(*) AS total FROM productos WHERE inhabilitado = FALSE AND nombre_producto LIKE ?;";
+    const [total] = await db.execute(sqlTotalProductos, [`%${search}%`]);
+
+    return res
+      .status(200)
+      .send({ productos: productos[0], paginacion: { total: total[0].total } });
   } catch (error) {
-    console.error("Error al obtener los productos:", error.message);
-    return res.status(500).send({ error: "Error al obtener los productos" });
+    return res.status(500).send({ error: "Error al traer productos" });
   }
 });
 
@@ -84,8 +87,7 @@ router.put(
     const idCategoria = req.body.idCategoria;
     const modificadoPor = req.body.modificadoPor;
 
-    const sql =
-      "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const sql = "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     try {
       await db.execute(sql, [
@@ -98,7 +100,7 @@ router.put(
         precioFinal,
         idCategoria,
         modificadoPor,
-        id
+        id,
       ]);
 
       return res.status(200).send({
@@ -112,7 +114,7 @@ router.put(
           incremento,
           precioFinal,
           idCategoria,
-          modificadoPor
+          modificadoPor,
         },
       });
     } catch (error) {
@@ -139,19 +141,16 @@ router.post("/", validarAtributosProducto("POST"), async (req, res) => {
   const idCategoria = req.body.idCategoria;
 
   try {
-    await db.execute(
-      `CALL spNuevoProducto (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        nombreProducto,
-        stockActual,
-        precioLista,
-        descuentoUno,
-        descuentoDos,
-        incremento,
-        precioFinal,
-        idCategoria
-      ]
-    );
+    await db.execute(`CALL spNuevoProducto (?, ?, ?, ?, ?, ?, ?, ?)`, [
+      nombreProducto,
+      stockActual,
+      precioLista,
+      descuentoUno,
+      descuentoDos,
+      incremento,
+      precioFinal,
+      idCategoria,
+    ]);
 
     return res.status(201).send({ producto: { nombreProducto } });
   } catch (error) {
