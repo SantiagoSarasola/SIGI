@@ -53,7 +53,7 @@ function Productos() {
   // }, [terminoBusqueda, productosOriginales]);
 
   const handleVerDetalles = (id) => {
-    alert(`Ver detalles del producto con ID: ${id}`);
+    navigate(`/productos/${id}`);
   };
 
   const handleBorrar = async (id) => {
@@ -93,7 +93,7 @@ function Productos() {
   };
 
   const handleAgregar = () => {
-    navigate("/agregar_producto");
+    navigate("/productos/agregar");
   };
 
   const handleSort = (columnaClickeada) => {
