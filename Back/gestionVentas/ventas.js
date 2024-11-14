@@ -1,39 +1,18 @@
 import express from "express";
 import { db } from "../db.js";
-import validarPaginacionProductos from "../middlewares/validarPaginacionProductos.js";
 import validarId from "../middlewares/validarId.js";
 import validarAtributosProducto from "../middlewares/validarAtributosProducto.js";
 import { validationResult } from "express-validator";
 const router = express.Router();
 
-router.get("/", /*validarPaginacionProductos(),*/ async (req, res) => {
-  // const validacion = validationResult(req);
-  // if (!validacion.isEmpty()) {
-  //   return res.status(400).send({ errores: validacion.array() });
-  // }
+router.get("/", async (req, res) => {
 
   try {
-    // const sqlFetchProductos = "CALL spVerProductos(?, ?, ?, ?,?)";
-    // const [productos] = await db.execute(sqlFetchProductos, [
-    //   offset,
-    //   limit,
-    //   sort,
-    //   order,
-    //   search,
-    // ]);
-
-    // const sqlTotalProductos =
-    //   "SELECT COUNT(*) AS total FROM productos WHERE inhabilitado = FALSE AND nombre_producto LIKE ?;";
-    // const [total] = await db.execute(sqlTotalProductos, [`%${search}%`]);
-    // const ventas = "SELECT * FROM ventas";
-    
-    const sqlFetchVentasProductos = 
-      "SELECT id_venta, total_venta, cantidad_productos, id_forma_pago, fecha " + 
-      "FROM ventas";
-    const [ventas2] = await db.execute(sqlFetchVentasProductos);
-    return res.status(200).send({ ventas2});
+    const sql = "CALL spVerVentas()";
+    const [ventas] = await db.execute(sql);
+    return res.status(200).send({ ventas : ventas[0]});
   } catch (error) {
-    return res.status(500).send({ error: "Error al traer ventas de productos" });
+    return res.status(500).send({ error: "Error al traer ventas" });
   }
 });
 
@@ -46,26 +25,39 @@ router.get("/:id/ventas_producto", validarId(), async (req, res) => {
   const id = Number(req.params.id);
 
   try {
-    const sql = 
-      "SELECT p.nombre_producto, p.precio_final, vp.cantidad, vp.subtotal_venta, v.fecha " + 
-      "FROM ventas v " + 
-      "JOIN ventas_producto vp " + 
-      "ON v.id_venta = vp.id_venta " +
-      "JOIN productos p " +
-      "ON vp.id_producto = p.id_producto " +
-      "WHERE vp.id_venta = ?";
-    // const sql = "CALL spVerProductoPorId(?)";
+    const sql = "CALL spVerVentaYProductosPorId (?)";
     const [ventaProductos] = await db.execute(sql, [id]);
 
     if (ventaProductos[0].length === 0) {
       return res.status(404).send({ error: "Venta de productos no encontrada" });
     }
 
-    // return res.status(200).send({ ventaProductos: ventaProductos[0][0] });
-    return res.status(200).send({ ventaProductos });
+    const ventaYProductos = {
+      idVenta: ventaProductos[0][0].id_venta,
+      fecha: ventaProductos[0][0].fecha,
+      ventaTotal: ventaProductos[0][0].venta_total,
+      idFormaPago: ventaProductos[0][0].id_forma_pago,
+      cantidadTotal: ventaProductos[0][0].cantidad_total,
+      productos: []
+    };
+
+    ventaProductos[0].forEach(producto => {
+      ventaYProductos.productos.push({
+        idProducto : producto.id_producto,
+        nombreProducto : producto.nombre_producto,
+        stockActual : producto.stock_actual,
+        precioLista : producto.precio_lista,
+        precioFinal : producto.precio_final,
+        precioLista : producto.precio_lista,
+        cantidad : producto.cantidad,
+        subTotal : producto.venta_subtotal
+      })
+    })
+
+    return res.status(200).send({ ventaYProductos });
   } catch (error) {
-    console.error("Error al traer la venta de productos: ", error.message);
-    return res.status(500).send({ error: "Error al traer la venta de productos" });
+    console.error("Error al traer la venta y  los productos: ", error.message);
+    return res.status(500).send({ error: "Error al traer la venta y  los productos" });
   }
 });
 
