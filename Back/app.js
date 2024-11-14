@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { connectDB } from "./db.js";
 import routerProductos from "./inventario/productos.js";
+import routerVentas from "./gestionVentas/ventas.js";
 import routerCategorias from "./inventario/categorias.js";
 import routerUsuarios from "./login/usuarios.js";
 import routerRoles from "./login/roles.js";
@@ -22,6 +23,7 @@ authConfig();
 
 // Conecta la ruta "productos" con el router
 app.use("/productos", routerProductos);
+app.use("/ventas", routerVentas);
 app.use("/usuarios", routerUsuarios);
 app.use("/categorias", routerCategorias);
 app.use("/roles", routerRoles);
