@@ -15,9 +15,9 @@ function App() {
         <Route path="/" element={<VentanaPrincipal />} />
         <Route path="/ventas" element={<Ventas />} />
         <Route path="/productos" element={<Productos />} />
-        <Route path="/agregar_producto/" element={<AgregarProducto />} />
-        <Route path="/editar_producto/:id" element={<EditarProducto />} />
-        <Route path="/detalle_producto/:id" element={<DetalleProducto />} />
+        <Route path="/productos/agregar" element={<AgregarProducto />} />
+        <Route path="/productos/:id" element={<DetalleProducto/>}  />
+        <Route path="/productos/:id/editar" element={<EditarProducto />} />
       </Routes>
     </Router>
   );
