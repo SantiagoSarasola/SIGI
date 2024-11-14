@@ -339,7 +339,10 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE spVerVentas()
 BEGIN 
-		SELECT * FROM ventas;
+		SELECT v.id_venta, v.venta_total, v.cantidad_total, fp.descripcion as forma_pago, v.fecha 
+        FROM ventas v
+        JOIN formas_pago fp
+        ON v.id_forma_pago = fp.id_forma_pago;
 END//
 DELIMITER ;
 
@@ -350,10 +353,12 @@ CREATE PROCEDURE spVerVentaYProductosPorId(
 BEGIN 
 	SELECT 
 		p.id_producto, p.nombre_producto, p.stock_actual, p.precio_lista, p.precio_final, 
-        vp.cantidad, vp.venta_subtotal, v.id_venta, v.id_forma_pago, v.fecha, v.cantidad_total, v.venta_total
+        vp.cantidad, vp.venta_subtotal, v.id_venta, v.fecha, v.cantidad_total, v.venta_total, fp.descripcion as forma_pago
     FROM ventas v 
     JOIN ventas_producto vp 
     ON v.id_venta = vp.id_venta 
+    JOIN formas_pago fp
+    ON v.id_forma_pago = fp.id_forma_pago
     JOIN productos p 
     ON vp.id_producto = p.id_producto
     WHERE vp.id_venta = idVenta;

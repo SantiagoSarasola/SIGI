@@ -36,7 +36,7 @@ router.get("/:id/ventas_producto", validarId(), async (req, res) => {
       idVenta: ventaProductos[0][0].id_venta,
       fecha: ventaProductos[0][0].fecha,
       ventaTotal: ventaProductos[0][0].venta_total,
-      idFormaPago: ventaProductos[0][0].id_forma_pago,
+      formaPago: ventaProductos[0][0].forma_pago,
       cantidadTotal: ventaProductos[0][0].cantidad_total,
       productos: []
     };
