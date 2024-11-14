@@ -1,7 +1,6 @@
 import express from "express";
 import { db } from "../db.js";
 import validarId from "../middlewares/validarId.js";
-import validarAtributosProducto from "../middlewares/validarAtributosProducto.js";
 import { validationResult } from "express-validator";
 const router = express.Router();
 
@@ -61,100 +60,6 @@ router.get("/:id/ventas_producto", validarId(), async (req, res) => {
   }
 });
 
-router.put(
-  "/:id",
-  validarId(),
-  validarAtributosProducto("PUT"),
-  async (req, res) => {
-    const validacion = validationResult(req);
-    if (!validacion.isEmpty()) {
-      res.status(400).send({ errores: validacion.array() });
-      return;
-    }
-
-    const id = Number(req.params.id);
-    const nombreProducto = req.body.nombreProducto;
-    const stockActual = req.body.stockActual;
-    const precioLista = req.body.precioLista;
-    const descuentoUno = req.body.descuentoUno;
-    const descuentoDos = req.body.descuentoDos;
-    const incremento = req.body.incremento;
-    const precioFinal = req.body.precioFinal;
-    const idCategoria = req.body.idCategoria;
-    const modificadoPor = req.body.modificadoPor;
-
-    const sql = "CALL spModificarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    try {
-      await db.execute(sql, [
-        nombreProducto,
-        stockActual,
-        precioLista,
-        descuentoUno,
-        descuentoDos,
-        incremento,
-        precioFinal,
-        idCategoria,
-        modificadoPor,
-        id,
-      ]);
-
-      return res.status(200).send({
-        producto: {
-          id,
-          nombreProducto,
-          stockActual,
-          precioLista,
-          descuentoUno,
-          descuentoDos,
-          incremento,
-          precioFinal,
-          idCategoria,
-          modificadoPor,
-        },
-      });
-    } catch (error) {
-      console.error("Error al editar el producto: ", error.message);
-      return res.status(500).send({ error: "Error al editar el producto" });
-    }
-  }
-);
-
-router.post("/", validarAtributosProducto("POST"), async (req, res) => {
-  const validacion = validationResult(req);
-  if (!validacion.isEmpty()) {
-    res.status(400).send({ errores: validacion.array() });
-    return;
-  }
-
-  const nombreProducto = req.body.nombreProducto;
-  const stockActual = req.body.stockActual;
-  const precioLista = req.body.precioLista;
-  const descuentoUno = req.body.descuentoUno;
-  const descuentoDos = req.body.descuentoDos;
-  const incremento = req.body.incremento;
-  const precioFinal = req.body.precioFinal;
-  const idCategoria = req.body.idCategoria;
-
-  try {
-    await db.execute(`CALL spNuevoProducto (?, ?, ?, ?, ?, ?, ?, ?)`, [
-      nombreProducto,
-      stockActual,
-      precioLista,
-      descuentoUno,
-      descuentoDos,
-      incremento,
-      precioFinal,
-      idCategoria,
-    ]);
-
-    return res.status(201).send({ producto: { nombreProducto } });
-  } catch (error) {
-    console.error("Error al insertar el producto: ", error.message);
-    return res.status(500).send({ error: "Error al insertar el producto" });
-  }
-});
-
 router.delete("/:id", validarId(), async (req, res) => {
   const validacion = validationResult(req);
   if (!validacion.isEmpty()) {
@@ -164,14 +69,14 @@ router.delete("/:id", validarId(), async (req, res) => {
 
   const id = Number(req.params.id);
 
-  const sql = "CALL spEliminarProducto(?)";
+  const sql = "CALL spEliminarVenta(?)";
 
   try {
     await db.execute(sql, [id]);
     return res.status(200).send({ id });
   } catch (error) {
-    console.error("Error al eliminar el producto: ", error.message);
-    return res.status(500).send({ error: "Error al eliminar el producto" });
+    console.error("Error al eliminar la venta: ", error.message);
+    return res.status(500).send({ error: "Error al eliminar la venta" });
   }
 });
 

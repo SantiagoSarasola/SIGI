@@ -80,6 +80,7 @@ CREATE TABLE `ventas` (
   `venta_total` decimal(10,2) NOT NULL,
   `id_forma_pago` int NOT NULL,
   `cantidad_total` int NOT NULL,
+  `inhabilitada` tinyint DEFAULT NULL,
   PRIMARY KEY (`id_venta`),
   KEY `id_forma_pago` (`id_forma_pago`),
   CONSTRAINT `id_forma_pago` FOREIGN KEY (`id_forma_pago`) REFERENCES `formas_pago` (`id_forma_pago`)
@@ -124,10 +125,10 @@ INSERT INTO usuarios (email, password, id_rol) VALUES
 ('vendedor@example.com', 'password456', 2),
 ('cliente@example.com', 'password789', 3);
 
-INSERT INTO ventas (fecha, venta_total, id_forma_pago, cantidad_total) VALUES
-('2024-10-01', 1600.00, 2, 3),
-('2024-10-02', 137.00, 1, 3),
-('2024-10-03', 99.00, 3, 2);
+INSERT INTO ventas (fecha, venta_total, id_forma_pago, cantidad_total, inhabilitada) VALUES
+('2024-10-01', 1600.00, 2, 3, 0),
+('2024-10-02', 137.00, 1, 3, 0),
+('2024-10-03', 99.00, 3, 2, 0);
 
 INSERT INTO ventas_producto (id_venta, id_producto, cantidad, venta_subtotal) VALUES
 (1, 1, 1, 1600.00),
@@ -342,7 +343,8 @@ BEGIN
 		SELECT v.id_venta, v.venta_total, v.cantidad_total, fp.descripcion as forma_pago, v.fecha 
         FROM ventas v
         JOIN formas_pago fp
-        ON v.id_forma_pago = fp.id_forma_pago;
+        ON v.id_forma_pago = fp.id_forma_pago
+        WHERE inhabilitada = FALSE;
 END//
 DELIMITER ;
 
@@ -361,6 +363,14 @@ BEGIN
     ON v.id_forma_pago = fp.id_forma_pago
     JOIN productos p 
     ON vp.id_producto = p.id_producto
-    WHERE vp.id_venta = idVenta;
+    WHERE vp.id_venta = idVenta AND v.inhabilitada = FALSE;
+END//
+DELIMITER ;
+
+-- SOFT DELETE VENTA
+DELIMITER //
+CREATE PROCEDURE spEliminarVenta(IN idVenta INT)
+BEGIN 
+    UPDATE ventas SET inhabilitada = TRUE WHERE id_venta = idVenta;
 END//
 DELIMITER ;
