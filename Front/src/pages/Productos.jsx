@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Productos.css";
-import Menu from "../components/Menu";
 import Paginacion from "../components/Paginacion";
 
 function Productos() {
@@ -43,7 +42,7 @@ function Productos() {
   }, [paginaActual, limite, sort, order, terminoBusqueda]);
 
   const handleVerDetalles = (id) => {
-    navigate(`/productos/${id}`);
+    navigate(`${id}`);
   };
 
   const handleBorrar = async (id) => {
@@ -80,7 +79,7 @@ function Productos() {
   };
 
   const handleAgregar = () => {
-    navigate("/productos/agregar");
+    navigate("agregar");
   };
 
   const handleSort = (columnaClickeada) => {
@@ -100,9 +99,6 @@ function Productos() {
 
   return (
     <>
-      <div>
-        <Menu />
-      </div>
       <div className="productos">
         <div className="header-productos">
           <h2>Productos</h2>

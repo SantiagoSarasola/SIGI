@@ -179,9 +179,8 @@ BEGIN
             p.precio_lista,
             p.precio_final,
             p.stock_actual,
-            c.descripcion AS categoria
+            p.id_categoria
         FROM productos AS p
-        JOIN categorias_producto AS c ON p.id_categoria = c.id_categoria
         WHERE p.inhabilitado = 0
         AND p.nombre_producto LIKE "%', busqueda, '%"
         ORDER BY ', colValida, ' ', dirValida, '
@@ -210,9 +209,8 @@ BEGIN
             p.descuento_dos,
             p.incremento,
             p.precio_final,
-            c.descripcion AS categoria
+            p.id_categoria
         FROM productos AS p
-        JOIN categorias_producto AS c ON p.id_categoria = c.id_categoria
         WHERE p.id_producto = ? AND p.inhabilitado = 0
     ');
 
