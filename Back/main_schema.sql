@@ -92,6 +92,7 @@ CREATE TABLE `ventas_producto` (
   `id_producto` int NOT NULL,
   `cantidad` int NOT NULL,
   `venta_subtotal` decimal(10,2) NOT NULL,
+  `inhabilitada` tinyint DEFAULT NULL,
   PRIMARY KEY (`id_venta_producto`),
   KEY `id_venta` (`id_venta`),
   KEY `id_producto` (`id_producto`),
@@ -370,5 +371,6 @@ DELIMITER //
 CREATE PROCEDURE spEliminarVenta(IN idVenta INT)
 BEGIN 
     UPDATE ventas SET inhabilitada = TRUE WHERE id_venta = idVenta;
+    UPDATE ventas_producto SET inhabilitada = TRUE WHERE id_venta = idVenta;
 END//
 DELIMITER ;
