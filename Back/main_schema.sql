@@ -80,7 +80,7 @@ CREATE TABLE `ventas` (
   `venta_total` decimal(10,2) NOT NULL,
   `id_forma_pago` int NOT NULL,
   `cantidad_total` int NOT NULL,
-  `inhabilitada` tinyint DEFAULT NULL,
+  `inhabilitada` tinyint DEFAULT FALSE,
   PRIMARY KEY (`id_venta`),
   KEY `id_forma_pago` (`id_forma_pago`),
   CONSTRAINT `id_forma_pago` FOREIGN KEY (`id_forma_pago`) REFERENCES `formas_pago` (`id_forma_pago`)
@@ -354,7 +354,8 @@ CREATE PROCEDURE spVerVentaYProductosPorId(
 BEGIN 
 	SELECT 
 		p.id_producto, p.nombre_producto, p.stock_actual, p.precio_lista, p.precio_final, 
-        vp.cantidad, vp.venta_subtotal, v.id_venta, v.fecha, v.cantidad_total, v.venta_total, fp.descripcion as forma_pago
+        vp.cantidad, vp.venta_subtotal, v.id_venta, v.fecha, v.cantidad_total, v.venta_total, 
+        fp.descripcion as forma_pago, fp.id_forma_pago
     FROM ventas v 
     JOIN ventas_producto vp 
     ON v.id_venta = vp.id_venta 
@@ -365,6 +366,47 @@ BEGIN
     WHERE vp.id_venta = idVenta AND v.inhabilitada = FALSE;
 END//
 DELIMITER ;
+
+-- INSERT VENTA
+DELIMITER //
+CREATE PROCEDURE spCrearVenta(
+    IN ventaTotal DECIMAL(10, 2),
+    IN cantidadTotal INT,
+    IN formaPago INT)
+BEGIN
+    INSERT INTO ventas (venta_total, cantidad_total, id_forma_pago, fecha)
+    VALUES (ventaTotal, cantidadTotal, formaPago, CURRENT_TIMESTAMP());
+        SELECT LAST_INSERT_ID() AS id_venta;
+END //
+DELIMITER ;
+
+-- INSERT VENTAS_PRODUCTO
+DELIMITER //
+CREATE PROCEDURE spCrearVentasProducto(
+    IN idVenta INT,
+    IN idProducto INT,
+    IN cantidad INT,
+    IN ventaSubTotal DECIMAL(10, 2)
+    )
+BEGIN
+    INSERT INTO ventas_producto (id_venta, id_producto, cantidad, venta_subtotal)
+    VALUES (idVenta, idProducto, cantidad, ventaSubTotal);
+END //
+DELIMITER ;
+
+-- UPDATE PRODUCTOS - STOCK ACTUAL
+DELIMITER //
+CREATE PROCEDURE `spModificarStockActual`(
+	IN idProducto INT,
+    IN cantidadADescontar INT
+)
+BEGIN
+		UPDATE productos
+        SET stock_actual = stock_actual - cantidadADescontar
+        WHERE id_producto = idProducto;
+END//
+DELIMITER ;
+
 
 -- SOFT DELETE VENTA
 DELIMITER //

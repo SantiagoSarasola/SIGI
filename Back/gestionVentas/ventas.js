@@ -36,6 +36,7 @@ router.get("/:id/ventas_producto", validarId(), async (req, res) => {
       fecha: ventaProductos[0][0].fecha,
       ventaTotal: ventaProductos[0][0].venta_total,
       formaPago: ventaProductos[0][0].forma_pago,
+      idFormaPago: ventaProductos[0][0].id_forma_pago,
       cantidadTotal: ventaProductos[0][0].cantidad_total,
       productos: []
     };
@@ -57,6 +58,43 @@ router.get("/:id/ventas_producto", validarId(), async (req, res) => {
   } catch (error) {
     console.error("Error al traer la venta y  los productos: ", error.message);
     return res.status(500).send({ error: "Error al traer la venta y  los productos" });
+  }
+});
+
+router.post("/", async (req, res) => {
+  const validacion = validationResult(req);
+  if (!validacion.isEmpty()) {
+    res.status(400).send({ errores: validacion.array() });
+    return;
+  }
+
+  const ventaTotal = req.body.ventaTotal;
+  const cantidadTotal = req.body.cantidadTotal;
+  const idFormaPago = req.body.idFormaPago;
+  const productos = req.body.productos;
+  
+  try {
+    const sqlInsertarVenta = 'CALL spCrearVenta (?,?,?)';
+    const resultadoVentaInsertada = await db.execute(sqlInsertarVenta, [ventaTotal, cantidadTotal, idFormaPago]);
+    const idVenta = resultadoVentaInsertada[0][0][0].id_venta;;
+    
+    const sqlInsertarVentasProductos = "CALL spCrearVentasProducto (?, ?, ?, ?)"
+    const sqlModificarStockActualProducto = "CALL spModificarStockActual (?, ?)"
+
+    productos.forEach(producto => {
+      const idProducto = producto.idProducto;
+      const cantidad = producto.cantidad;
+      const ventaSubTotal = producto.ventaSubTotal;
+
+      db.execute(sqlInsertarVentasProductos, [idVenta, idProducto, cantidad, ventaSubTotal]);
+      db.execute(sqlModificarStockActualProducto, [idProducto, cantidad]);
+      
+    });
+
+    return res.status(201).send({ venta: { idVenta } });
+  } catch (error) {
+    console.error("Error al insertar la venta: ", error.message);
+    return res.status(500).send({ error: "Error al insertar la venta" });
   }
 });
 
