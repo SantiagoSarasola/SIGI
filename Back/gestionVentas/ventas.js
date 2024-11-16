@@ -81,15 +81,14 @@ router.post("/", async (req, res) => {
     const sqlInsertarVentasProductos = "CALL spCrearVentasProducto (?, ?, ?, ?)"
     const sqlModificarStockActualProducto = "CALL spModificarStockActual (?, ?)"
 
-    productos.forEach(producto => {
+    for (const producto of productos) {
       const idProducto = producto.idProducto;
       const cantidad = producto.cantidad;
       const ventaSubTotal = producto.ventaSubTotal;
-
-      db.execute(sqlInsertarVentasProductos, [idVenta, idProducto, cantidad, ventaSubTotal]);
-      db.execute(sqlModificarStockActualProducto, [idProducto, cantidad]);
-      
-    });
+  
+      await db.execute(sqlInsertarVentasProductos, [idVenta, idProducto, cantidad, ventaSubTotal]);
+      await db.execute(sqlModificarStockActualProducto, [idProducto, cantidad]);
+    }
 
     return res.status(201).send({ venta: { idVenta } });
   } catch (error) {
