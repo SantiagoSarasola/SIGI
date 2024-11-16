@@ -396,7 +396,7 @@ DELIMITER ;
 
 -- UPDATE PRODUCTOS - STOCK ACTUAL
 DELIMITER //
-CREATE PROCEDURE `spModificarStockActual`(
+CREATE PROCEDURE spModificarStockActual(
 	IN idProducto INT,
     IN cantidadADescontar INT
 )
