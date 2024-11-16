@@ -92,7 +92,7 @@ CREATE TABLE `ventas_producto` (
   `id_producto` int NOT NULL,
   `cantidad` int NOT NULL,
   `venta_subtotal` decimal(10,2) NOT NULL,
-  `inhabilitada` tinyint DEFAULT NULL,
+  `inhabilitada` tinyint DEFAULT FALSE,
   PRIMARY KEY (`id_venta_producto`),
   KEY `id_venta` (`id_venta`),
   KEY `id_producto` (`id_producto`),
