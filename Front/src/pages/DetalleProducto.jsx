@@ -1,66 +1,83 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../styles/DetalleProducto.module.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-//Ejemplo producto
-const productoEjemplo = {
-    id: '001',
-    nombre: 'Alimento Premium para Perros',
-    stock: 50,
-    precioLista: 500,
-    descuentoUno: 10,
-    costoIntermedio: 450,
-    descuentoDos: 5,
-    costoFinal: 427.5,
-    incremento: 20,
-    precioSugerido: 600,
-    precioFinal: 512.5,
-    ganancia: 85,
-    categoria: 'Alimentos para Perros',
-    fabrica: 'Nutripet'
+function DetalleProducto() {
+  const [producto, setProducto] = useState(null);
+  const { id } = useParams(); 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const getProducto = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/productos/${id}`);
+        if (response.ok) {
+          const { producto } = await response.json();
+          setProducto(producto);
+        } else {
+          console.error("Error al obtener el producto:", response.status);
+        }
+      } catch (error) {
+        console.error("Error en la conexión:", error);
+      }
+    };
+
+    getProducto();
+  }, [id]); 
+
+  const handleEdit = () => {
+    navigate(`/productos/${id}/editar`);
   };
 
-
-const DetalleProducto = ({ product = productoEjemplo }) => {
-
-    const navigate = useNavigate(); 
-    
-    const handleEdit = () => {
-        navigate(`./editar_producto/${product.id}`); 
-    }
   return (
     <div className={styles.pageContainer}>
       <h2 className={styles.pageTitle}>Consultar Producto</h2>
-      <div className={styles.viewGroup}>
-        <label>ID Producto:</label>
-        <div>{product.id}</div>
-      </div>
-      <div className={styles.viewGroup}>
-        <label>Nombre del Producto:</label>
-        <div>{product.nombre}</div>
-      </div>
-      <div className={styles.viewGroup}>
-        <label>Stock:</label>
-        <div>{product.stock}</div>
-      </div>
-      <div className={styles.viewGroup}>
-        <label>Precio de Lista:</label>
-        <div>${product.precioLista}</div>
-      </div>
-      <div className={styles.viewGroup}>
-        <label>Categoría:</label>
-        <div>{product.categoria}</div>
-      </div>
-      <div className={styles.viewGroup}>
-        <label>Fábrica:</label>
-        <div>{product.fabrica}</div>
-      </div>
-      <button onClick={() => {
-        alert("Se cancelo la operacion!")}} className={`${styles.button} ${styles.cancelButton}`}>Cancelar</button>
-      <button className={`${styles.button} ${styles.saveButton}`} onClick={handleEdit}>Editar</button>
+      {producto ? (
+        <>
+          <div className={styles.viewGroup}>
+            <label>ID Producto:</label>
+            <div>{producto.id_producto}</div>
+          </div>
+          <div className={styles.viewGroup}>
+            <label>Nombre del Producto:</label>
+            <div>{producto.nombre_producto}</div>
+          </div>
+          <div className={styles.viewGroup}>
+            <label>Stock Actual:</label>
+            <div>{producto.stock_actual}</div>
+          </div>
+          <div className={styles.viewGroup}>
+            <label>Precio de Lista:</label>
+            <div>${producto.precio_lista}</div>
+          </div>
+          <div className={styles.viewGroup}>
+            <label>Descuento 1:</label>
+            <div>${producto.descuento_uno}</div>
+          </div>
+          <div className={styles.viewGroup}>
+            <label>Descuento 2:</label>
+            <div>${producto.descuento_dos}</div>
+          </div>
+          <div className={styles.viewGroup}>
+            <label>Incremento:</label>
+            <div>${producto.incremento}</div>
+          </div>
+          <div className={styles.viewGroup}>
+            <label>Precio Final:</label>
+            <div>${producto.precio_final}</div>
+          </div>
+          <div className={styles.viewGroup}>
+            <label>Categoría:</label>
+            <div>{producto.categoria}</div>
+          </div>
+          <button onClick={()=>navigate(`/productos`)} className={`${styles.button} ${styles.cancelButton}`}>Cancelar</button>
+          <button className={`${styles.button} ${styles.saveButton}`} onClick={handleEdit}>Editar</button>
+        </>
+      ) : (
+        <p>Cargando...</p>
+      )}
     </div>
   );
-};
-
+}
 
 export default DetalleProducto;
