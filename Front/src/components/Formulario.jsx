@@ -38,7 +38,7 @@ const Formulario = ({ producto, onSave, onCancel }) => {
   const elegirCategoria = (e) => {
     const idActual = parseInt(e.target.value);
     if (idActual === -1) {
-      navigate("/productos/gestion_categoria"); 
+      navigate("/productos/categorias"); 
     } else {
       setData({ ...data, id_categoria: idActual });
     }
