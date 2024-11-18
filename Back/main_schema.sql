@@ -354,7 +354,8 @@ CREATE PROCEDURE spVerVentaYProductosPorId(
 BEGIN 
 	SELECT 
 		p.id_producto, p.nombre_producto, p.stock_actual, p.precio_lista, p.precio_final, 
-        vp.cantidad, vp.venta_subtotal, v.id_venta, v.fecha, v.cantidad_total, v.venta_total, 
+        vp.cantidad, vp.venta_subtotal, vp.id_venta_producto, 
+        v.id_venta, v.fecha, v.cantidad_total, v.venta_total, 
         fp.descripcion as forma_pago, fp.id_forma_pago
     FROM ventas v 
     JOIN ventas_producto vp 
@@ -363,7 +364,7 @@ BEGIN
     ON v.id_forma_pago = fp.id_forma_pago
     JOIN productos p 
     ON vp.id_producto = p.id_producto
-    WHERE vp.id_venta = idVenta AND v.inhabilitada = FALSE;
+    WHERE vp.id_venta = idVenta AND vp.inhabilitada = FALSE;
 END//
 DELIMITER ;
 
@@ -376,21 +377,102 @@ CREATE PROCEDURE spCrearVenta(
 BEGIN
     INSERT INTO ventas (venta_total, cantidad_total, id_forma_pago, fecha)
     VALUES (ventaTotal, cantidadTotal, formaPago, CURRENT_TIMESTAMP());
-        SELECT LAST_INSERT_ID() AS id_venta;
+    SELECT LAST_INSERT_ID() AS id_venta;
+    
+    CALL spModificarStockActual(idProducto, cantidad);
 END //
+DELIMITER ;
+
+-- UPDATE VENTA
+DELIMITER //
+CREATE PROCEDURE spModificarVenta(
+    IN idVenta INT,
+    IN ventaTotal DECIMAL(10,2),
+    IN cantidadTotal INT,
+    IN idFormaPago INT
+)
+BEGIN
+    UPDATE ventas 
+    SET venta_total = ventaTotal, cantidad_total = cantidadTotal, id_forma_pago = idFormaPago
+    WHERE id_venta = idVenta;
+END//
+DELIMITER ;
+
+-- SOFT DELETE VENTA
+DELIMITER //
+CREATE PROCEDURE spEliminarVenta(IN idVenta INT)
+BEGIN 
+    UPDATE ventas SET inhabilitada = TRUE WHERE id_venta = idVenta;
+    UPDATE ventas_producto SET inhabilitada = TRUE WHERE id_venta = idVenta;
+END//
 DELIMITER ;
 
 -- INSERT VENTAS_PRODUCTO
 DELIMITER //
-CREATE PROCEDURE spCrearVentasProducto(
+CREATE PROCEDURE spAgregarProductoAVenta(
     IN idVenta INT,
     IN idProducto INT,
     IN cantidad INT,
     IN ventaSubTotal DECIMAL(10, 2)
-    )
+)
 BEGIN
     INSERT INTO ventas_producto (id_venta, id_producto, cantidad, venta_subtotal)
     VALUES (idVenta, idProducto, cantidad, ventaSubTotal);
+
+    CALL spModificarStockActual(idProducto, cantidad);
+
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE spModificarProductoDeUnaVenta(
+    IN idVentaProducto INT,
+    IN idProducto INT,
+    IN cantidad INT,
+    IN ventaSubTotal DECIMAL(10, 2)
+)
+BEGIN
+    -- Variables para chequear si se reemplaza a un producto viejo por uno nuevo
+    DECLARE idProductoAnterior INT;
+    DECLARE cantidadAnterior INT;
+    DECLARE diferenciaCantidad INT;
+
+     -- Obtencion de los valores anteriores a la modificacion: Id_producto y cantidad
+    SELECT id_producto, cantidad
+    INTO idProductoAnterior, cantidadAnterior
+    FROM ventas_producto
+    WHERE id_venta_producto = idVentaProducto;
+
+    -- Actualizacion de venta_producto
+    UPDATE ventas_producto
+    SET id_producto = idProducto, cantidad = cantidad, venta_subtotal = ventaSubTotal
+    WHERE id_venta_producto = idVentaProducto;
+
+    -- Validar si se reemplaza a un producto viejo por uno nuevo y hacer las actualizaciones de stock
+    IF idProductoAnterior != idProducto THEN
+        CALL spModificarStockActual(idProductoAnterior, cantidadAnterior * (-1));
+        CALL spModificarStockActual(idProducto, cantidad);
+    ELSE 
+        SET diferenciaCantidad = cantidad - cantidadAnterior;
+        CALL spModificarStockActual(idProducto, diferenciaCantidad * (-1));
+    END IF;
+END //
+DELIMITER ;
+
+-- SOFT DELETE VENTAS_PRODUCTO
+DELIMITER //
+CREATE PROCEDURE spEliminarProductoDeUnaVenta(
+    IN idVentaProducto INT,
+    IN idProducto INT,
+    IN cantidad INT
+)
+BEGIN
+    UPDATE ventas_producto
+    SET inhabilitada = TRUE
+    WHERE id_venta_producto = idVentaProducto;
+    
+    CALL spModificarStockActual(idProducto, cantidad * (-1));
+
 END //
 DELIMITER ;
 
@@ -407,12 +489,10 @@ BEGIN
 END//
 DELIMITER ;
 
-
--- SOFT DELETE VENTA
+-- SP FORMAS PAGO
 DELIMITER //
-CREATE PROCEDURE spEliminarVenta(IN idVenta INT)
-BEGIN 
-    UPDATE ventas SET inhabilitada = TRUE WHERE id_venta = idVenta;
-    UPDATE ventas_producto SET inhabilitada = TRUE WHERE id_venta = idVenta;
+CREATE PROCEDURE `spVerFormasPago`()
+BEGIN
+	SELECT * FROM formas_pago;
 END//
 DELIMITER ;

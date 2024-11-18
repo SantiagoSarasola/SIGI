@@ -5,6 +5,7 @@ import Productos from "./pages/Productos";
 import AgregarProducto from "./pages/AgregarProducto";
 import DetalleProducto from "./pages/DetalleProducto";
 import EditarProducto from "./pages/EditarProducto";
+import GestionCategorias from './pages/GestionCategoria';
 import Layout from "./components/Layout";
 import VentanaPrincipal from "./pages/VentanaPrincipal";
 import DetalleVentas from "./pages/DetalleVentas";
@@ -19,6 +20,7 @@ function App() {
         <Route path="productos/agregar" element={<AgregarProducto />} />
         <Route path="productos/:id" element={<DetalleProducto />} />
         <Route path="productos/:id/editar" element={<EditarProducto />} />
+        <Route path="productos/categorias" element={<GestionCategorias />} />
         <Route path="/ventas/:id" element={<DetalleVentas />} />
       </Route>
     </Routes>
