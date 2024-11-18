@@ -8,6 +8,9 @@ function DetalleVentas() {
   const [venta, setVenta] = useState(null); 
   const [productos, setProductos] = useState([]); 
   const [error, setError] = useState(""); 
+  const [formasPago, setFormasPago] = useState([]);
+  const [editando, setEditando] = useState([]);
+  const [formaPagoSeleccionada, setFormaPagoSeleccionada] = useState("");
 
   
   useEffect(() => {
@@ -28,13 +31,41 @@ function DetalleVentas() {
         setError("No se pudo cargar la información de la venta.");
       }
     };
-
     obtenerDetalleVenta();
-  }, [id]);
+  }, []);
 
- 
+    useEffect(() => {
+      const obetenerFormasPago = async () => {
+        try {
+          const respuesta = await fetch(`http://localhost:3000/pagos`);
+  
+          if (!respuesta.ok) {
+            const errorData = await respuesta.json();
+            throw new Error(`Error ${respuesta.status}: ${errorData.error}`);
+          }
+  
+          const data = await respuesta.json();
+          setFormasPago(data.formasPago);
+        } catch (error) {
+          console.error("Error al obtener las forams de pago:", error);
+          setError("No se pudo cargar la información de las formas de pago.");
+        }
+      };
+      
+
+      obetenerFormasPago();
+  }, []);
+
+  const handleBorrar = (id) => {
+    alert("elimino una venta")
+  };
+
   const handleVolver = () => {
     navigate("/ventas");
+  };
+
+  const handleEditar = () => {
+    setEditando(true);
   };
 
   return (
@@ -45,13 +76,30 @@ function DetalleVentas() {
           <h2>Detalle de Venta #{venta.idVenta}</h2>
           <p><strong>Fecha:</strong> {new Date(venta.fecha).toLocaleDateString("es-ES")}</p>
           <p><strong>Total de Venta:</strong> ${venta.ventaTotal}</p>
-          <p><strong>Forma de Pago:</strong> {venta.formaPago}</p>
+          <div>
+            <strong>Forma de Pago:</strong> 
+            {editando ? (
+              <select 
+                value={formaPagoSeleccionada}
+                onChange={(e) => setFormaPagoSeleccionada(e.target.value)}
+              >
+                {formasPago.map((forma) =>(
+                  <option key={forma.id_forma_pago} value = {forma.id_forma_pago}>
+                    {forma.descripcion}
+                  </option>
+                ))}
+              </select>
+                ) : (
+                  <p>{venta.formaPago}</p>
+                )}
+          </div>
           <p><strong>Cantidad Total:</strong> {venta.cantidadTotal}</p>
 
           <h3>Productos</h3>
           <table className="productos-tabla">
             <thead>
               <tr>
+                <th></th>
                 <th>ID Producto</th>
                 <th>Nombre</th>
                 <th>Precio</th>
@@ -62,6 +110,14 @@ function DetalleVentas() {
             <tbody>
               {productos.map((producto) => (
                 <tr key={producto.idProducto}>
+                  <td>
+                    <button
+                      className="btn-eliminar"
+                      onClick={() => handleBorrar(producto.idProducto)}
+                    >
+                      🗑️
+                    </button>
+                  </td>
                   <td>{producto.idProducto}</td>
                   <td>{producto.nombreProducto}</td>
                   <td>${producto.precioLista}</td>
@@ -74,6 +130,9 @@ function DetalleVentas() {
 
           <button className="btn-volver" onClick={handleVolver}>
             Volver a Ventas
+          </button>
+          <button className="btn-editar" onClick={handleEditar}>
+            Editar
           </button>
         </>
       ) : (
