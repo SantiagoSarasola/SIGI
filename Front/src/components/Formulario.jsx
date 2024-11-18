@@ -1,4 +1,5 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; 
 import styles from "../styles/Formulario.module.css";
 
 const Formulario = ({ producto, onSave, onCancel }) => {
@@ -12,32 +13,36 @@ const Formulario = ({ producto, onSave, onCancel }) => {
     incremento: producto?.incremento || 0,
     precio_final: producto?.precio_final || 0,
     id_categoria: producto?.id_categoria || 0,
-    modificadoPor:13
+    modificadoPor: 13
   });
-  const[categorias,setCategorias] = useState([])
+  const [categorias, setCategorias] = useState([]);
+  const navigate = useNavigate(); 
 
-  useEffect(()=>{
-    const getCategorias = async () =>{
-      const response = await fetch("http://localhost:3000/categorias")
-      if (response.ok){
-        const result = await response.json(); 
+  useEffect(() => {
+    const getCategorias = async () => {
+      const response = await fetch("http://localhost:3000/categorias");
+      if (response.ok) {
+        const result = await response.json();
         const categorias = result.categorias[0];
         setCategorias(categorias);
       }
-    }
+    };
     getCategorias();
-  },[])
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
   };
 
-  const elegirCategoria = (e)=> {
-    const idActual = parseInt(e.target.value)
-    setData({...data,id_categoria:idActual})
-    
-  }
+  const elegirCategoria = (e) => {
+    const idActual = parseInt(e.target.value);
+    if (idActual === -1) {
+      navigate("/productos/gestion_categoria"); 
+    } else {
+      setData({ ...data, id_categoria: idActual });
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,7 +68,6 @@ const Formulario = ({ producto, onSave, onCancel }) => {
       
       if (response.ok) {
         const { producto } = await response.json();
-        // alert("Producto guardado con éxito!");
         onSave(producto);
       } else {
         console.error("Error al guardar el producto:", response.status);
@@ -72,12 +76,15 @@ const Formulario = ({ producto, onSave, onCancel }) => {
       console.error("Error en la conexión:", error);
     }
   };
+
   return (
     <form className={styles.formContainer} onSubmit={handleSubmit}>
-      {data.id_producto > 0 && <div className={styles.formGroup}>
-        <label>ID Producto</label>
-        <input type="text" value={data.id_producto} readOnly />
-      </div>}
+      {data.id_producto > 0 && (
+        <div className={styles.formGroup}>
+          <label>ID Producto</label>
+          <input type="text" value={data.id_producto} readOnly />
+        </div>
+      )}
 
       <div className={styles.formGroup}>
         <label>Nombre del Producto</label>
@@ -145,11 +152,13 @@ const Formulario = ({ producto, onSave, onCancel }) => {
       <div className={styles.formGroup}>
         <label>Categoría</label>
         <select name="idCategoria" value={data.id_categoria} onChange={elegirCategoria}>
-          {
-            categorias.map((cat)=>(
-              <option key={cat.id_categoria} value={cat.id_categoria} >{cat.descripcion}</option>
-            ))
-          }
+          <option value="" disabled>Selecciona una categoría</option>
+          {categorias.map((cat) => (
+            <option key={cat.id_categoria} value={cat.id_categoria}>
+              {cat.descripcion}
+            </option>
+          ))}
+          <option value={-1}>Agregar nueva categoría</option>
         </select>
       </div>
       <div className={styles.buttonGroup}>
@@ -165,3 +174,4 @@ const Formulario = ({ producto, onSave, onCancel }) => {
 };
 
 export default Formulario;
+
