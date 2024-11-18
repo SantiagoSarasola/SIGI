@@ -6,6 +6,7 @@ import Productos from './pages/Productos';
 import AgregarProducto from './pages/AgregarProducto';
 import DetalleProducto from './pages/DetalleProducto';
 import EditarProducto from './pages/EditarProducto';
+import GestionCategorias from './pages/GestionCategoria';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/productos/agregar" element={<AgregarProducto />} />
         <Route path="/productos/:id" element={<DetalleProducto/>}  />
         <Route path="/productos/:id/editar" element={<EditarProducto />} />
+        <Route path="/productos/gestion_categoria" element={<GestionCategorias />} />
       </Routes>
     </Router>
   );
