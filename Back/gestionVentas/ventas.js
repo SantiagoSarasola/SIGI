@@ -43,6 +43,7 @@ router.get("/:id/ventas_producto", validarId(), async (req, res) => {
 
     ventaProductos[0].forEach(producto => {
       ventaYProductos.productos.push({
+        idVentaProducto : producto.id_venta_producto,
         idProducto : producto.id_producto,
         nombreProducto : producto.nombre_producto,
         stockActual : producto.stock_actual,
@@ -78,22 +79,64 @@ router.post("/", async (req, res) => {
     const resultadoVentaInsertada = await db.execute(sqlInsertarVenta, [ventaTotal, cantidadTotal, idFormaPago]);
     const idVenta = resultadoVentaInsertada[0][0][0].id_venta;;
     
-    const sqlInsertarVentasProductos = "CALL spCrearVentasProducto (?, ?, ?, ?)"
-    const sqlModificarStockActualProducto = "CALL spModificarStockActual (?, ?)"
+    const sqlAgregarProductoAVenta = "CALL spAgregarProductoAVenta (?, ?, ?, ?)"
 
     for (const producto of productos) {
       const idProducto = producto.idProducto;
       const cantidad = producto.cantidad;
       const ventaSubTotal = producto.ventaSubTotal;
   
-      await db.execute(sqlInsertarVentasProductos, [idVenta, idProducto, cantidad, ventaSubTotal]);
-      await db.execute(sqlModificarStockActualProducto, [idProducto, cantidad]);
+      await db.execute(sqlAgregarProductoAVenta, [idVenta, idProducto, cantidad, ventaSubTotal]);
     }
 
     return res.status(201).send({ venta: { idVenta } });
   } catch (error) {
     console.error("Error al insertar la venta: ", error.message);
     return res.status(500).send({ error: "Error al insertar la venta" });
+  }
+});
+
+router.put("/:id/ventas_producto", validarId(), async(req,res) => {
+  const validacion = validationResult(req);
+  if(!validacion.isEmpty()){
+    res.status(400).send({ errores: validacion.array() });
+    return;
+  }
+
+  const idVenta = Number(req.params.id);
+  const ventaTotal = req.body.ventaTotal;
+  const cantidadTotal = req.body.cantidadTotal;
+  const idFormaPago = req.body.idFormaPago;
+  const productos = req.body.productos;
+
+  const sqlModificarVenta = "CALL spModificarVenta(?, ?, ?, ?)";
+  const sqlModificarProductoDeUnaVenta = "CALL spModificarProductoDeUnaVenta(?, ?, ?, ?)";
+  const sqlAgregarProductoAVenta = "CALL spAgregarProductoAVenta(?, ?, ?, ?)";
+  const sqlEliminarProductoDeUnaVenta = "CALL spEliminarProductoDeUnaVenta(?, ?, ?)";
+
+  try {
+    await db.execute(sqlModificarVenta, [idVenta, ventaTotal, cantidadTotal, idFormaPago]);
+
+    for(const producto of productos){
+      const idVentaProducto = producto.idVentaProducto;
+      const idProducto = producto.idProducto;
+      const cantidad = producto.cantidad;
+      const ventaSubTotal = producto.ventaSubTotal;
+      const accion = producto.accion;
+
+      if(accion === "agregar"){
+        await db.execute(sqlAgregarProductoAVenta, [idVenta, idProducto, cantidad, ventaSubTotal]);
+      }else if(accion === "eliminar"){
+        await db.execute(sqlEliminarProductoDeUnaVenta, [idVentaProducto, idProducto, cantidad]);
+      }else if(accion === "modificar"){
+        await db.execute(sqlModificarProductoDeUnaVenta, [idVentaProducto, idProducto, cantidad, ventaSubTotal]);
+      }
+    }
+
+    return res.status(201).send({ venta: { idVenta } });
+  } catch(error){
+    console.error("Error al editar la venta: ", error.message);
+    return res.status(500).send({ error: "Error al editar la venta" });
   }
 });
 
