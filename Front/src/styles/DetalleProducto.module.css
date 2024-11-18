@@ -42,9 +42,11 @@
 .cancelButton {
   background-color: #f44336;
   color: #fff;
+  padding: 5px 10px;
 }
 
 .saveButton {
   background-color: #4caf50;
   color: #fff;
+  padding: 5px 10px;
 }
