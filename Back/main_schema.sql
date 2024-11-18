@@ -488,3 +488,11 @@ BEGIN
         WHERE id_producto = idProducto;
 END//
 DELIMITER ;
+
+-- SP FORMAS PAGO
+DELIMITER //
+CREATE PROCEDURE `spVerFormasPago`()
+BEGIN
+	SELECT * FROM formas_pago;
+END//
+DELIMITER ;
