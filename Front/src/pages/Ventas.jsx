@@ -1,12 +1,146 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Paginacion from "../components/Paginacion";
 import React from "react";
 import "../styles/Ventas.css";
 
 function Ventas() {
+  const [ventas, setVentas] = useState([]); 
+  const [totalVentas, setTotalVentas] = useState(0); 
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [limite, setLimite] = useState(10);
+
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    const traerVentas = async () => {
+      try {
+        const respuesta = await fetch(
+          `http://localhost:3000/ventas?offset=${
+            (paginaActual - 1) * limite
+          }&limit=${limite}`
+        );
+
+        if (!respuesta.ok) {
+          const errorData = await respuesta.json();
+          throw new Error(`Error ${respuesta.status}: ${errorData.error}`);
+        }
+
+        const data = await respuesta.json();
+
+        setVentas(data.ventas);
+        setTotalVentas(data.ventas.length);
+      } catch (error) {
+        console.error("Error al obtener las ventas:", error);
+        alert("No se pudo obtener las ventas");
+      }
+    };
+
+    traerVentas();
+  }, [paginaActual, limite]);
+
+  const handleAgregar = () => {
+    navigate("/agregar_venta");
+  };
+
+  const handleVerDetalles = (id) => {
+    navigate(`/ventas/${id}`);
+  };
+
+  const handleBorrar = async (id) => {
+    const confirmacion = window.confirm(`¿Estás seguro de eliminar la venta con ID ${id}?`);
+    if (!confirmacion) return;
+  
+    try {
+      const respuesta = await fetch(`http://localhost:3000/ventas/${id}`, {
+        method: "DELETE",
+      });
+  
+      if (!respuesta.ok) {
+        const errorData = await respuesta.json();
+        throw new Error(`Error ${respuesta.status}: ${errorData.error}`);
+      }
+  
+      setVentas((prevVentas) => prevVentas.filter((venta) => venta.id_venta !== id));
+      alert("Venta eliminada correctamente.");
+    } catch (error) {
+      console.error("Error al eliminar la venta:", error);
+      alert("No se pudo eliminar la venta.");
+    }
+  };
+
+  const sumaTotalVentas = ventas.reduce(
+    (total, venta) => total + parseFloat(venta.venta_total),
+    0
+  );
+
   return (
     <div className="ventas">
-      <div className="contenido">
+      <div className="header-ventas">
         <h2>Ventas</h2>
-        <p>ventana de Ventas.</p>
+        <button className="btn-nuevo" onClick={handleAgregar}>
+          Añadir Venta
+        </button>
+      </div>
+
+      <Paginacion
+        paginaActual={paginaActual}
+        totalPaginas={Math.ceil(totalVentas / limite)}
+        onPaginaChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
+        registrosVisibles={`Registros ${
+          (paginaActual - 1) * limite + 1
+        }-${Math.min(paginaActual * limite, totalVentas)} de ${totalVentas}`}
+      />
+
+      <table className="ventas-tabla">
+        <thead>
+          <tr>
+            <th></th>
+            <th>ID Venta</th>
+            <th>Fecha</th>
+            <th>Cantidad de Productos</th>
+            <th>Total Venta</th>
+            <th>Forma de Pago</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ventas.length > 0 ? (
+            ventas.map((venta) => (
+              <tr key={venta.id_venta}>
+                <td>
+                  <button
+                    className="btn-detalles"
+                    onClick={() => handleVerDetalles(venta.id_venta)}
+                  >
+                    🔍
+                  </button>
+                  <button
+                    className="btn-eliminar"
+                    onClick={() => handleBorrar(venta.id_venta)}
+                  >
+                    🗑️
+                  </button>
+                </td>
+                <td>{venta.id_venta}</td>
+                <td>{new Date(venta.fecha).toLocaleDateString("es-ES")}</td>
+                <td>{venta.cantidad_total}</td>
+                <td>${parseFloat(venta.venta_total).toFixed(2)}</td>
+                <td>{venta.forma_pago}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5">No se encontraron ventas</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+     
+      <div className="total-ventas">
+        <h3>
+          Total de Ventas: ${sumaTotalVentas.toFixed(2)}
+        </h3>
       </div>
     </div>
   );
