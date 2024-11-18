@@ -8,6 +8,7 @@ import EditarProducto from "./pages/EditarProducto";
 import GestionCategorias from './pages/GestionCategoria';
 import Layout from "./components/Layout";
 import VentanaPrincipal from "./pages/VentanaPrincipal";
+import DetalleVentas from "./pages/DetalleVentas";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="productos/:id" element={<DetalleProducto />} />
         <Route path="productos/:id/editar" element={<EditarProducto />} />
         <Route path="productos/categorias" element={<GestionCategorias />} />
+        <Route path="/ventas/:id" element={<DetalleVentas />} />
       </Route>
     </Routes>
   );
