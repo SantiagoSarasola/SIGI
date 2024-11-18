@@ -19,7 +19,7 @@ function App() {
         <Route path="productos/agregar" element={<AgregarProducto />} />
         <Route path="productos/:id" element={<DetalleProducto />} />
         <Route path="productos/:id/editar" element={<EditarProducto />} />
-        <Route path="productos/gestion-categorias" element={<GestionCategorias />} />
+        <Route path="productos/categorias" element={<GestionCategorias />} />
       </Route>
     </Routes>
   );
