@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Productos.css";
-import Menu from "../components/Menu";
 import Paginacion from "../components/Paginacion";
 
 function Productos() {
   const [productos, setProductos] = useState([]);
   const [productosOriginales, setProductosOriginales] = useState([]);
   const [sort, setSort] = useState("nombre_producto");
-  const [order, setOrder] = useState("DESC");
+  const [order, setOrder] = useState("ASC");
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
   const navigate = useNavigate();
   const [paginaActual, setPaginaActual] = useState(1);
@@ -31,8 +30,8 @@ function Productos() {
         );
         const data = await resultado.json();
 
-        setProductos(data.productos); // Actualiza los productos visibles
-        setTotalProductos(data.paginacion.total || 0); // Actualiza el total de productos desde el backend
+        setProductos(data.productos);
+        setTotalProductos(data.paginacion.total || 0);
       } catch (error) {
         console.error("Error al obtener los productos:", error);
         alert("No se pudo obtener los productos");
@@ -42,18 +41,8 @@ function Productos() {
     traerProductos();
   }, [paginaActual, limite, sort, order, terminoBusqueda]);
 
-  // Filtrar productos por búsqueda
-  // useEffect(() => {
-  //   const productosFiltrados = productosOriginales.filter((producto) =>
-  //     producto.nombre_producto
-  //       .toLowerCase()
-  //       .includes(terminoBusqueda.toLowerCase())
-  //   );
-  //   setProductos(productosFiltrados);
-  // }, [terminoBusqueda, productosOriginales]);
-
   const handleVerDetalles = (id) => {
-    navigate(`/productos/${id}`);
+    navigate(`${id}`);
   };
 
   const handleBorrar = async (id) => {
@@ -75,9 +64,6 @@ function Productos() {
         setProductos((prevProductos) =>
           prevProductos.filter((producto) => producto.id_producto !== id)
         );
-        // setProductosOriginales((prevProductos) =>
-        //   prevProductos.filter((producto) => producto.id_producto !== id)
-        // );
       } else {
         const error = await respuesta.json();
         alert(
@@ -93,7 +79,7 @@ function Productos() {
   };
 
   const handleAgregar = () => {
-    navigate("/productos/agregar");
+    navigate("agregar");
   };
 
   const handleSort = (columnaClickeada) => {
@@ -113,9 +99,6 @@ function Productos() {
 
   return (
     <>
-      <div>
-        <Menu />
-      </div>
       <div className="productos">
         <div className="header-productos">
           <h2>Productos</h2>

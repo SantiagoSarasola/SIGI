@@ -1,7 +1,6 @@
 -- DROPEAR TABLAS Y SPs
 DROP TABLE IF EXISTS ventas_producto;
 DROP TABLE IF EXISTS ventas;
-DROP TABLE IF EXISTS repartidores;
 DROP TABLE IF EXISTS productos;
 DROP TABLE IF EXISTS formas_pago;
 DROP TABLE IF EXISTS categorias_producto;
@@ -75,26 +74,16 @@ CREATE TABLE `productos` (
   CONSTRAINT `modificado_por` FOREIGN KEY (`modificado_por`) REFERENCES `usuarios` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `repartidores` (
-  `id_repartidor` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(50) NOT NULL,
-  PRIMARY KEY (`id_repartidor`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 CREATE TABLE `ventas` (
   `id_venta` int NOT NULL AUTO_INCREMENT,
   `fecha` date NOT NULL,
-  `precio_delivery` decimal(10,2) NOT NULL,
-  `id_repartidor` int NOT NULL,
-  `total_venta` decimal(10,2) DEFAULT NULL,
+  `venta_total` decimal(10,2) NOT NULL,
   `id_forma_pago` int NOT NULL,
-  `entregado` tinyint DEFAULT NULL,
-  `facturado` tinyint DEFAULT NULL,
+  `cantidad_total` int NOT NULL,
+  `inhabilitada` tinyint DEFAULT FALSE,
   PRIMARY KEY (`id_venta`),
-  KEY `id_repartidor` (`id_repartidor`),
   KEY `id_forma_pago` (`id_forma_pago`),
-  CONSTRAINT `id_forma_pago` FOREIGN KEY (`id_forma_pago`) REFERENCES `formas_pago` (`id_forma_pago`),
-  CONSTRAINT `id_repartidor` FOREIGN KEY (`id_repartidor`) REFERENCES `repartidores` (`id_repartidor`)
+  CONSTRAINT `id_forma_pago` FOREIGN KEY (`id_forma_pago`) REFERENCES `formas_pago` (`id_forma_pago`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `ventas_producto` (
@@ -102,7 +91,8 @@ CREATE TABLE `ventas_producto` (
   `id_venta` int NOT NULL,
   `id_producto` int NOT NULL,
   `cantidad` int NOT NULL,
-  `subtotal_venta` decimal(10,2) NOT NULL,
+  `venta_subtotal` decimal(10,2) NOT NULL,
+  `inhabilitada` tinyint DEFAULT FALSE,
   PRIMARY KEY (`id_venta_producto`),
   KEY `id_venta` (`id_venta`),
   KEY `id_producto` (`id_producto`),
@@ -126,11 +116,6 @@ INSERT INTO productos (nombre_producto, stock_actual, precio_lista, descuento_un
 ('Chaleco Perro', 200, 50.00, 5.00, 2.00, 10.00, 52.00, 2),
 ('Muñeco Perro', 150, 30.00, 5.00, 3.00, 8.00, 33.00, 3);
 
-INSERT INTO repartidores (nombre) VALUES
-('Juan Pérez'),
-('María López'),
-('Carlos Gómez');
-
 INSERT INTO roles (nombre) VALUES
 ('Administrador'),
 ('Editor'),
@@ -141,15 +126,16 @@ INSERT INTO usuarios (email, password, id_rol) VALUES
 ('vendedor@example.com', 'password456', 2),
 ('cliente@example.com', 'password789', 3);
 
-INSERT INTO ventas (fecha, precio_delivery, id_repartidor, total_venta, id_forma_pago, entregado, facturado) VALUES
-('2024-10-01', 50.00, 1, 1650.00, 2, 1, 1),
-('2024-10-02', 20.00, 2, 60.00, 1, 0, 1),
-('2024-10-03', 30.00, 3, 300.00, 3, 1, 0);
+INSERT INTO ventas (fecha, venta_total, id_forma_pago, cantidad_total, inhabilitada) VALUES
+('2024-10-01', 1600.00, 2, 3, 0),
+('2024-10-02', 137.00, 1, 3, 0),
+('2024-10-03', 99.00, 3, 2, 0);
 
-INSERT INTO ventas_producto (id_venta, id_producto, cantidad, subtotal_venta) VALUES
+INSERT INTO ventas_producto (id_venta, id_producto, cantidad, venta_subtotal) VALUES
 (1, 1, 1, 1600.00),
 (2, 2, 2, 104.00),
-(3, 3, 3, 90.00);
+(3, 3, 3, 99.00),
+(2, 3, 1, 33.00);
 
 -- STORE PROCEDURES
 -- GET ALL
@@ -194,9 +180,8 @@ BEGIN
             p.precio_lista,
             p.precio_final,
             p.stock_actual,
-            c.descripcion AS categoria
+            p.id_categoria
         FROM productos AS p
-        JOIN categorias_producto AS c ON p.id_categoria = c.id_categoria
         WHERE p.inhabilitado = 0
         AND p.nombre_producto LIKE "%', busqueda, '%"
         ORDER BY ', colValida, ' ', dirValida, '
@@ -225,9 +210,8 @@ BEGIN
             p.descuento_dos,
             p.incremento,
             p.precio_final,
-            c.descripcion AS categoria
+            p.id_categoria
         FROM productos AS p
-        JOIN categorias_producto AS c ON p.id_categoria = c.id_categoria
         WHERE p.id_producto = ? AND p.inhabilitado = 0
     ');
 
@@ -348,5 +332,87 @@ CREATE PROCEDURE `spEliminarCategoria`(
 )
 BEGIN
 	UPDATE categorias_producto SET inhabilitado = TRUE WHERE id_categoria = idCategoria;
+END//
+DELIMITER ;
+
+-- GET ALL VENTAS
+DELIMITER //
+CREATE PROCEDURE spVerVentas()
+BEGIN 
+		SELECT v.id_venta, v.venta_total, v.cantidad_total, fp.descripcion as forma_pago, v.fecha 
+        FROM ventas v
+        JOIN formas_pago fp
+        ON v.id_forma_pago = fp.id_forma_pago
+        WHERE inhabilitada = FALSE;
+END//
+DELIMITER ;
+
+-- GET VENTAS BY ID
+DELIMITER //
+CREATE PROCEDURE spVerVentaYProductosPorId(
+   IN idVenta INT)
+BEGIN 
+	SELECT 
+		p.id_producto, p.nombre_producto, p.stock_actual, p.precio_lista, p.precio_final, 
+        vp.cantidad, vp.venta_subtotal, v.id_venta, v.fecha, v.cantidad_total, v.venta_total, 
+        fp.descripcion as forma_pago, fp.id_forma_pago
+    FROM ventas v 
+    JOIN ventas_producto vp 
+    ON v.id_venta = vp.id_venta 
+    JOIN formas_pago fp
+    ON v.id_forma_pago = fp.id_forma_pago
+    JOIN productos p 
+    ON vp.id_producto = p.id_producto
+    WHERE vp.id_venta = idVenta AND v.inhabilitada = FALSE;
+END//
+DELIMITER ;
+
+-- INSERT VENTA
+DELIMITER //
+CREATE PROCEDURE spCrearVenta(
+    IN ventaTotal DECIMAL(10, 2),
+    IN cantidadTotal INT,
+    IN formaPago INT)
+BEGIN
+    INSERT INTO ventas (venta_total, cantidad_total, id_forma_pago, fecha)
+    VALUES (ventaTotal, cantidadTotal, formaPago, CURRENT_TIMESTAMP());
+        SELECT LAST_INSERT_ID() AS id_venta;
+END //
+DELIMITER ;
+
+-- INSERT VENTAS_PRODUCTO
+DELIMITER //
+CREATE PROCEDURE spCrearVentasProducto(
+    IN idVenta INT,
+    IN idProducto INT,
+    IN cantidad INT,
+    IN ventaSubTotal DECIMAL(10, 2)
+    )
+BEGIN
+    INSERT INTO ventas_producto (id_venta, id_producto, cantidad, venta_subtotal)
+    VALUES (idVenta, idProducto, cantidad, ventaSubTotal);
+END //
+DELIMITER ;
+
+-- UPDATE PRODUCTOS - STOCK ACTUAL
+DELIMITER //
+CREATE PROCEDURE spModificarStockActual(
+	IN idProducto INT,
+    IN cantidadADescontar INT
+)
+BEGIN
+		UPDATE productos
+        SET stock_actual = stock_actual - cantidadADescontar
+        WHERE id_producto = idProducto;
+END//
+DELIMITER ;
+
+
+-- SOFT DELETE VENTA
+DELIMITER //
+CREATE PROCEDURE spEliminarVenta(IN idVenta INT)
+BEGIN 
+    UPDATE ventas SET inhabilitada = TRUE WHERE id_venta = idVenta;
+    UPDATE ventas_producto SET inhabilitada = TRUE WHERE id_venta = idVenta;
 END//
 DELIMITER ;
