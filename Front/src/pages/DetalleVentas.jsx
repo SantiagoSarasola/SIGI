@@ -9,7 +9,7 @@ function DetalleVentas() {
   const [productos, setProductos] = useState([]); 
   const [error, setError] = useState(""); 
   const [formasPago, setFormasPago] = useState([]);
-  const [editando, setEditando] = useState([]);
+  const [editando, setEditando] = useState(false);
   const [formaPagoSeleccionada, setFormaPagoSeleccionada] = useState("");
 
   
@@ -45,14 +45,13 @@ function DetalleVentas() {
           }
   
           const data = await respuesta.json();
-          setFormasPago(data.formasPago);
+          setFormasPago(data.formasPago[0]);
         } catch (error) {
           console.error("Error al obtener las forams de pago:", error);
           setError("No se pudo cargar la información de las formas de pago.");
         }
       };
       
-
       obetenerFormasPago();
   }, []);
 
@@ -65,8 +64,17 @@ function DetalleVentas() {
   };
 
   const handleEditar = () => {
+    alert('Usted esta habilitado para editar los registros')
     setEditando(true);
   };
+
+  const handleGuardar = () => {
+    alert('deberia guardar lo editado')
+  }
+
+  const handleAgregar = () => {
+    alert('deberia agregar un producto')
+  }
 
   return (
     <div className="detalle-ventas">
@@ -113,6 +121,7 @@ function DetalleVentas() {
                   <td>
                     <button
                       className="btn-eliminar"
+                      disabled = {!editando}
                       onClick={() => handleBorrar(producto.idProducto)}
                     >
                       🗑️
@@ -127,13 +136,25 @@ function DetalleVentas() {
               ))}
             </tbody>
           </table>
-
-          <button className="btn-volver" onClick={handleVolver}>
-            Volver a Ventas
-          </button>
-          <button className="btn-editar" onClick={handleEditar}>
-            Editar
-          </button>
+          
+            <button className="botones-edicion" onClick={handleVolver}>
+              Volver a Ventas
+            </button>
+            <button className="botones-edicion" onClick={handleEditar}>
+              Editar
+            </button>
+            <button className="botones-edicion" 
+                    disabled={!editando}
+                    onClick={handleGuardar}
+            >
+                Guardar
+            </button>
+            <button className="botones-edicion" 
+                    disabled={!editando}
+                    onClick={handleAgregar}
+            >
+                + Productos
+            </button>
         </>
       ) : (
         <p>Cargando detalles de la venta...</p>
