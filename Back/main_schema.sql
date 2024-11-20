@@ -27,6 +27,15 @@ DROP PROCEDURE IF EXISTS spEliminarVenta;
 DROP PROCEDURE IF EXISTS spAgregarProductoAVenta;
 DROP PROCEDURE IF EXISTS spEliminarProductoDeUnaVenta;
 DROP PROCEDURE IF EXISTS spModificarStockActual;
+DROP PROCEDURE IF EXISTS spVerVentas;
+DROP PROCEDURE IF EXISTS spVerVentaYProductosPorId;
+DROP PROCEDURE IF EXISTS spCrearVenta;
+DROP PROCEDURE IF EXISTS spModificarVenta;
+DROP PROCEDURE IF EXISTS spEliminarVenta;
+DROP PROCEDURE IF EXISTS spAgregarProductoAVenta;
+DROP PROCEDURE IF EXISTS spModificarProductoDeUnaVenta;
+DROP PROCEDURE IF EXISTS spEliminarProductoDeUnaVenta;
+DROP PROCEDURE IF EXISTS spModificarStockActual;
 
 -- CREAR TABLAS
 
