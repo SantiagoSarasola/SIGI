@@ -5,11 +5,10 @@ import { validationResult } from "express-validator";
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-
   try {
     const sql = "CALL spVerVentas()";
     const [ventas] = await db.execute(sql);
-    return res.status(200).send({ ventas : ventas[0]});
+    return res.status(200).send({ ventas: ventas[0] });
   } catch (error) {
     return res.status(500).send({ error: "Error al traer ventas" });
   }
@@ -28,7 +27,9 @@ router.get("/:id/ventas_producto", validarId(), async (req, res) => {
     const [ventaProductos] = await db.execute(sql, [id]);
 
     if (ventaProductos[0].length === 0) {
-      return res.status(404).send({ error: "Venta de productos no encontrada" });
+      return res
+        .status(404)
+        .send({ error: "Venta de productos no encontrada" });
     }
 
     const ventaYProductos = {
@@ -38,27 +39,29 @@ router.get("/:id/ventas_producto", validarId(), async (req, res) => {
       formaPago: ventaProductos[0][0].forma_pago,
       idFormaPago: ventaProductos[0][0].id_forma_pago,
       cantidadTotal: ventaProductos[0][0].cantidad_total,
-      productos: []
+      productos: [],
     };
 
-    ventaProductos[0].forEach(producto => {
+    ventaProductos[0].forEach((producto) => {
       ventaYProductos.productos.push({
-        idVentaProducto : producto.id_venta_producto,
-        idProducto : producto.id_producto,
-        nombreProducto : producto.nombre_producto,
-        stockActual : producto.stock_actual,
-        precioLista : producto.precio_lista,
-        precioFinal : producto.precio_final,
-        precioLista : producto.precio_lista,
-        cantidad : producto.cantidad,
-        subTotal : producto.venta_subtotal
-      })
-    })
+        idVentaProducto: producto.id_venta_producto,
+        idProducto: producto.id_producto,
+        nombreProducto: producto.nombre_producto,
+        stockActual: producto.stock_actual,
+        precioLista: producto.precio_lista,
+        precioFinal: producto.precio_final,
+        precioLista: producto.precio_lista,
+        cantidad: producto.cantidad,
+        subTotal: producto.venta_subtotal,
+      });
+    });
 
     return res.status(200).send({ ventaYProductos });
   } catch (error) {
     console.error("Error al traer la venta y  los productos: ", error.message);
-    return res.status(500).send({ error: "Error al traer la venta y  los productos" });
+    return res
+      .status(500)
+      .send({ error: "Error al traer la venta y  los productos" });
   }
 });
 
@@ -73,32 +76,44 @@ router.post("/", async (req, res) => {
   const cantidadTotal = req.body.cantidadTotal;
   const idFormaPago = req.body.idFormaPago;
   const productos = req.body.productos;
-  
+
   try {
-    const sqlInsertarVenta = 'CALL spCrearVenta (?,?,?)';
-    const resultadoVentaInsertada = await db.execute(sqlInsertarVenta, [ventaTotal, cantidadTotal, idFormaPago]);
-    const idVenta = resultadoVentaInsertada[0][0][0].id_venta;;
-    
-    const sqlAgregarProductoAVenta = "CALL spAgregarProductoAVenta (?, ?, ?, ?)"
+    const sqlInsertarVenta = "CALL spCrearVenta (?,?,?)";
+    const resultadoVentaInsertada = await db.execute(sqlInsertarVenta, [
+      ventaTotal,
+      cantidadTotal,
+      idFormaPago,
+    ]);
+    const idVenta = resultadoVentaInsertada[0][0][0].id_venta;
+
+    const sqlAgregarProductoAVenta =
+      "CALL spAgregarProductoAVenta (?, ?, ?, ?)";
 
     for (const producto of productos) {
-      const idProducto = producto.idProducto;
+      const idProducto = producto.id_producto;
       const cantidad = producto.cantidad;
       const ventaSubTotal = producto.ventaSubTotal;
 
-      await db.execute(sqlAgregarProductoAVenta, [idVenta, idProducto, cantidad, ventaSubTotal]);
+      await db.execute(sqlAgregarProductoAVenta, [
+        idVenta,
+        idProducto,
+        cantidad,
+        ventaSubTotal,
+      ]);
     }
 
-    return res.status(201).send({ venta: { idVenta, ventaTotal, cantidadTotal, idFormaPago } });
+    return res
+      .status(201)
+      .send({ venta: { idVenta, ventaTotal, cantidadTotal, idFormaPago } });
   } catch (error) {
     console.error("Error al insertar la venta: ", error.message);
     return res.status(500).send({ error: "Error al insertar la venta" });
   }
 });
 
-router.put("/:id", validarId(), async(req,res) => {
+router.put("/:id", validarId(), async (req, res) => {
   const validacion = validationResult(req);
-  if(!validacion.isEmpty()){
+  if (!validacion.isEmpty()) {
     res.status(400).send({ errores: validacion.array() });
     return;
   }
@@ -111,10 +126,17 @@ router.put("/:id", validarId(), async(req,res) => {
   const sqlModificarVenta = "CALL spModificarVenta(?, ?, ?, ?)";
 
   try {
-    await db.execute(sqlModificarVenta, [idVenta, ventaTotal, cantidadTotal, idFormaPago]);
+    await db.execute(sqlModificarVenta, [
+      idVenta,
+      ventaTotal,
+      cantidadTotal,
+      idFormaPago,
+    ]);
 
-    return res.status(201).send({ ventaModificada: { idVenta, ventaTotal, cantidadTotal, idFormaPago } });
-  } catch(error){
+    return res.status(201).send({
+      ventaModificada: { idVenta, ventaTotal, cantidadTotal, idFormaPago },
+    });
+  } catch (error) {
     console.error("Error al editar la venta: ", error.message);
     return res.status(500).send({ error: "Error al editar la venta." });
   }
@@ -142,7 +164,7 @@ router.delete("/:id", validarId(), async (req, res) => {
 
 router.post("/:id/ventas_producto", validarId(), async (req, res) => {
   const validacion = validationResult(req);
-  if(!validacion.isEmpty()){
+  if (!validacion.isEmpty()) {
     res.status(400).send({ errores: validacion.array() });
     return;
   }
@@ -151,22 +173,34 @@ router.post("/:id/ventas_producto", validarId(), async (req, res) => {
   const idProducto = req.body.idProducto;
   const cantidad = req.body.cantidad;
   const ventaSubTotal = req.body.ventaSubTotal;
-  
+
   try {
     const sqlAgregarProductoAVenta = "CALL spAgregarProductoAVenta(?, ?, ?, ?)";
-    const resultadoProductoInsertadoAVenta = await db.execute(sqlAgregarProductoAVenta, [idVenta, idProducto, cantidad, ventaSubTotal]);
-    const id_ventas_producto = resultadoProductoInsertadoAVenta[0][0][0].id_venta_producto;
+    const resultadoProductoInsertadoAVenta = await db.execute(
+      sqlAgregarProductoAVenta,
+      [idVenta, idProducto, cantidad, ventaSubTotal]
+    );
+    const id_ventas_producto =
+      resultadoProductoInsertadoAVenta[0][0][0].id_venta_producto;
 
-    return res.status(201).send({ productoAgregado: { id_ventas_producto, idVenta, idProducto, cantidad, ventaSubTotal } });
+    return res.status(201).send({
+      productoAgregado: {
+        id_ventas_producto,
+        idVenta,
+        idProducto,
+        cantidad,
+        ventaSubTotal,
+      },
+    });
   } catch (error) {
-      console.error("Error al agregar producto:", error.message);
-      return res.status(500).send({ error: "Error al agregar producto." });
+    console.error("Error al agregar producto:", error.message);
+    return res.status(500).send({ error: "Error al agregar producto." });
   }
 });
 
 router.delete("/:id/ventas_producto/", async (req, res) => {
   const validacion = validationResult(req);
-  if(!validacion.isEmpty()){
+  if (!validacion.isEmpty()) {
     res.status(400).send({ errores: validacion.array() });
     return;
   }
@@ -176,13 +210,18 @@ router.delete("/:id/ventas_producto/", async (req, res) => {
   const cantidad = req.body.cantidad;
 
   try {
-    const sqlEliminarProductoDeUnaVenta = "CALL spEliminarProductoDeUnaVenta(?, ?, ?)";
-    await db.execute(sqlEliminarProductoDeUnaVenta, [idVentaProducto, idProducto, cantidad]);
-    
+    const sqlEliminarProductoDeUnaVenta =
+      "CALL spEliminarProductoDeUnaVenta(?, ?, ?)";
+    await db.execute(sqlEliminarProductoDeUnaVenta, [
+      idVentaProducto,
+      idProducto,
+      cantidad,
+    ]);
+
     return res.status(201).send({ id: { idVentaProducto } });
   } catch (error) {
-      console.error("Error al eliminado el producto:", error.message);
-      return res.status(500).send({ error: "Error al eliminado el producto." });
+    console.error("Error al eliminado el producto:", error.message);
+    return res.status(500).send({ error: "Error al eliminado el producto." });
   }
 });
 
