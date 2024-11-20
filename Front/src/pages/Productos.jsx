@@ -13,6 +13,7 @@ function Productos() {
   const [paginaActual, setPaginaActual] = useState(1);
   const [limite, setLimite] = useState(10);
   const [totalProductos, setTotalProductos] = useState(0);
+  const [categorias, setCategorias] = useState([]);
 
   const totalPaginas = Math.ceil(totalProductos / limite);
   const registrosInicio =
@@ -23,13 +24,18 @@ function Productos() {
   useEffect(() => {
     const traerProductos = async () => {
       try {
-        const resultado = await fetch(
+        const respuesta = await fetch(
           `http://localhost:3000/productos?offset=${
             (paginaActual - 1) * limite
           }&limit=${limite}&sort=${sort}&order=${order}&search=${terminoBusqueda}`
         );
-        const data = await resultado.json();
 
+        if (!respuesta.ok) {
+          const errorData = await respuesta.json();
+          throw new Error(`Error ${respuesta.status}: ${errorData.error}`);
+        }
+
+        const data = await respuesta.json();
         setProductos(data.productos);
         setTotalProductos(data.paginacion.total || 0);
       } catch (error) {
@@ -38,7 +44,25 @@ function Productos() {
       }
     };
 
+    const traerCategorias = async () => {
+      try {
+        const respuesta = await fetch("http://localhost:3000/categorias");
+
+        if (!respuesta.ok) {
+          const errorData = await respuesta.json();
+          throw new Error(`Error ${respuesta.status}: ${errorData.error}`);
+        }
+
+        const data = await respuesta.json();
+        setCategorias(data.categorias[0]);
+      } catch (error) {
+        console.error("Error al obtener las categorias:", error);
+        alert("No se pudo obtener las categorias");
+      }
+    };
+
     traerProductos();
+    traerCategorias();
   }, [paginaActual, limite, sort, order, terminoBusqueda]);
 
   const handleVerDetalles = (id) => {
@@ -132,9 +156,7 @@ function Productos() {
               <th onClick={() => handleSort("stock_actual")}>
                 Stock {mostrarFlecha("stock_actual")}
               </th>
-              <th onClick={() => handleSort("categoria")}>
-                Categoria {mostrarFlecha("categoria")}
-              </th>
+              <th>Categoria {mostrarFlecha("categoria")}</th>
             </tr>
             <tr>
               <th></th>
@@ -176,7 +198,14 @@ function Productos() {
                 <td>${producto.precio_lista}</td>
                 <td>${producto.precio_final}</td>
                 <td>{producto.stock_actual}</td>
-                <td>{producto.categoria}</td>
+                <td>
+                  {
+                    categorias.find(
+                      (categoria) =>
+                        categoria.id_categoria === producto.id_categoria
+                    )?.descripcion
+                  }
+                </td>
               </tr>
             ))}
           </tbody>
