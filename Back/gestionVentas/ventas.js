@@ -1,6 +1,8 @@
 import express from "express";
 import { db } from "../db.js";
 import validarId from "../middlewares/validarId.js";
+import validarAtributosVenta from "../middlewares/validarAtributosVenta.js";
+import validarAtributosVentaProducto from "../middlewares/validarAtributosVentaProducto.js";
 import { validationResult } from "express-validator";
 const router = express.Router();
 
@@ -65,7 +67,7 @@ router.get("/:id/ventas_producto", validarId(), async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", validarAtributosVenta(), async (req, res) => {
   const validacion = validationResult(req);
   if (!validacion.isEmpty()) {
     res.status(400).send({ errores: validacion.array() });
@@ -111,7 +113,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", validarId(), async (req, res) => {
+router.put("/:id", validarId(), validarAtributosVenta(), async (req, res) => {
   const validacion = validationResult(req);
   if (!validacion.isEmpty()) {
     res.status(400).send({ errores: validacion.array() });
@@ -162,7 +164,7 @@ router.delete("/:id", validarId(), async (req, res) => {
   }
 });
 
-router.post("/:id/ventas_producto", validarId(), async (req, res) => {
+router.post("/:id/ventas_producto", validarId(), validarAtributosVentaProducto(), async (req, res) => {
   const validacion = validationResult(req);
   if (!validacion.isEmpty()) {
     res.status(400).send({ errores: validacion.array() });
@@ -198,7 +200,7 @@ router.post("/:id/ventas_producto", validarId(), async (req, res) => {
   }
 });
 
-router.delete("/:id/ventas_producto/", async (req, res) => {
+router.delete("/:id/ventas_producto/", validarAtributosVentaProducto(), async (req, res) => {
   const validacion = validationResult(req);
   if (!validacion.isEmpty()) {
     res.status(400).send({ errores: validacion.array() });

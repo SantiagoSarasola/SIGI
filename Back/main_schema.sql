@@ -36,6 +36,7 @@ DROP PROCEDURE IF EXISTS spAgregarProductoAVenta;
 DROP PROCEDURE IF EXISTS spModificarProductoDeUnaVenta;
 DROP PROCEDURE IF EXISTS spEliminarProductoDeUnaVenta;
 DROP PROCEDURE IF EXISTS spModificarStockActual;
+DROP PROCEDURE IF EXISTS spVerFormasPago;
 
 -- CREAR TABLAS
 
@@ -314,7 +315,7 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE `spVerCategorias`()
 BEGIN
-	SELECT * FROM categorias_producto;
+	SELECT * FROM categorias_producto WHERE inhabilitado = 0;
 END//
 DELIMITER ;
 
