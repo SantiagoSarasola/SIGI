@@ -154,7 +154,7 @@ router.delete("/:id", validarId(), async (req, res) => {
   const id = Number(req.params.id);
 
   const sqlObtenerProductosDeVenta = "CALL spObtenerProductosDeVenta(?)";
-  const sql = "CALL spEliminarVenta(?)";
+  const sqlEliminarVenta = "CALL spEliminarVenta(?)";
   const sqlModificarStockActual = "CALL spModificarStockActual(?, ?)";
 
   try {
@@ -166,7 +166,7 @@ router.delete("/:id", validarId(), async (req, res) => {
       await db.execute(sqlModificarStockActual, [idProducto, -cantidad]);
     }
 
-    await db.execute(sql, [id]);
+    await db.execute(sqlEliminarVenta, [id]);
     return res.status(200).send({ id });
   } catch (error) {
     console.error("Error al eliminar la venta: ", error.message);
