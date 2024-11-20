@@ -7,6 +7,11 @@ function AgregarProductoVentas() {
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [cantidad, setCantidad] = useState(1);
   const [error, setError] = useState("");
+  const [detalleVenta, setDetalleVenta] = useState([]);
+  const [productosVendidos, setProductosVendidos] = useState([]);
+  const navigate = useNavigate();
+
+  const { idVenta } = useParams();
 
   useEffect(() => {
     const obtenerProductos = async () => {
@@ -34,6 +39,7 @@ function AgregarProductoVentas() {
       (prod) => prod.id_producto === parseInt(idProducto)
     );
     setProductoSeleccionado(producto);
+    setCantidad(1);
   };
 
   const handleCantidadChange = (e) => {
@@ -41,25 +47,101 @@ function AgregarProductoVentas() {
     setCantidad(nuevaCantidad > 0 ? nuevaCantidad : 1);
   };
 
-  const handleGuardar = () => {
-    // Este handleGuardar tiene que agregar el producto en la base de datos ventas_productos
+  const handleGuardar = async () => {
+    if (productosVendidos.length === 0) {
+      setError("Debe agregar un producto");
+      return;
+    }
+
+    try {
+      const respuesta = await fetch(`http://localhost:3000/ventas/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ventaTotal: ventaTotal,
+          cantidadTotal: cantidad,
+          idFormaPago: 1,
+          productos: productosVendidos,
+        }),
+      });
+
+      if (!respuesta.ok) {
+        const errorData = await respuesta.json();
+        throw new Error(`Error ${respuesta.status}: ${errorData.error}`);
+      }
+
+      navigate("/ventas", { replace: true });
+      console.log(respuesta);
+    } catch (error) {
+      console.error("Error al guardar el producto:", error);
+      setError("No se pudo agregar el producto a la venta.");
+    }
+  };
+
+  const subtotal = productoSeleccionado
+    ? productoSeleccionado.precio_final * cantidad
+    : 0;
+
+  const ventaTotal = productosVendidos.reduce(
+    (ac, current) => ac + current.ventaSubTotal,
+    0
+  );
+
+  const handleAgregarProducto = () => {
+    if (!productoSeleccionado || cantidad <= 0) {
+      setError("Seleccione un producto y una cantidad válida.");
+      return;
+    }
+
+    if (cantidad > productoSeleccionado.stock_actual) {
+      setError("La cantidad excede el stock disponible.");
+      return;
+    }
+
+    const estaCargado = productosVendidos.some(
+      (producto) => producto.id_producto === productoSeleccionado.id_producto
+    );
+    if (estaCargado) {
+      const productosActualizados = productosVendidos.map((producto) => {
+        if (producto.id_producto === productoSeleccionado.id_producto) {
+          return {
+            ...producto,
+            cantidad: cantidad,
+            ventaSubTotal: subtotal,
+          };
+        }
+        return producto;
+      });
+      setProductosVendidos(productosActualizados);
+    } else {
+      setProductosVendidos([
+        ...productosVendidos,
+        {
+          ...productoSeleccionado,
+          ventaSubTotal: subtotal,
+          cantidad: cantidad,
+        },
+      ]);
+    }
   };
 
   return (
     <div className="pagina-completa">
       <div className="detalle-ventas">
-        <h2>Detalle de Venta #</h2>
+        <h2>Detalle de Venta #{idVenta}</h2>
         <p>
-          <strong>Fecha:</strong>{" "}
+          <strong>Total de Venta:</strong> ${ventaTotal}
         </p>
         <p>
-          <strong>Total de Venta:</strong>
+          <strong>Fecha:</strong>{" "}
         </p>
         <div>
           <strong>Forma de Pago:</strong>
         </div>
         <p>
-          <strong>Cantidad Total:</strong>
+          <strong>Cantidad Total:</strong> {productosVendidos.length}
         </p>
         <table className="productos-tabla">
           <thead>
@@ -72,7 +154,23 @@ function AgregarProductoVentas() {
               <th>Subtotal</th>
             </tr>
           </thead>
-          <tbody>{/* cargar los productos que se van agregando  */}</tbody>
+          <tbody>
+            {productosVendidos.map((producto, index) => (
+              <tr key={producto.id_producto}>
+                <td></td>
+                <td>{producto.id_producto}</td>
+                <td>{producto.nombre_producto}</td>
+                <td>${producto.precio_final}</td>
+                <td>{producto.cantidad}</td>
+                <td>${producto.ventaSubTotal}</td>
+              </tr>
+            ))}
+            {productosVendidos.length === 0 && (
+              <tr>
+                <td colSpan="6">No hay productos en esta venta.</td>
+              </tr>
+            )}
+          </tbody>
         </table>
       </div>
 
@@ -109,8 +207,8 @@ function AgregarProductoVentas() {
               <strong>Stock Actual:</strong> {productoSeleccionado.stock_actual}
             </p>
             <p>
-              <strong>Precio Lista:</strong> $
-              {productoSeleccionado.precio_lista}
+              <strong>Precio Final:</strong> $
+              {productoSeleccionado.precio_final}
             </p>
           </div>
         )}
@@ -127,13 +225,19 @@ function AgregarProductoVentas() {
             />
           </div>
         )}
-        <div className="subtotal">
-          <h3>Sub-Total: </h3>
-        </div>
+
         <br />
+
         <button
           className="btn-guardar"
           disabled={!productoSeleccionado || cantidad <= 0}
+          onClick={handleAgregarProducto}
+        >
+          Agregar Producto
+        </button>
+        <button
+          className="btn-guardar"
+          disabled={productosVendidos.length === 0}
           onClick={handleGuardar}
         >
           Guardar

@@ -137,7 +137,7 @@ function DetalleVentas() {
                   </td>
                   <td>{producto.idProducto}</td>
                   <td>{producto.nombreProducto}</td>
-                  <td>${producto.precioLista}</td>
+                  <td>${producto.precioFinal}</td>
                   <td>{producto.cantidad}</td>
                   <td>${producto.subTotal}</td>
                 </tr>
