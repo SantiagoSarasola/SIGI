@@ -27,16 +27,8 @@ DROP PROCEDURE IF EXISTS spEliminarVenta;
 DROP PROCEDURE IF EXISTS spAgregarProductoAVenta;
 DROP PROCEDURE IF EXISTS spEliminarProductoDeUnaVenta;
 DROP PROCEDURE IF EXISTS spModificarStockActual;
-DROP PROCEDURE IF EXISTS spVerVentas;
-DROP PROCEDURE IF EXISTS spVerVentaYProductosPorId;
-DROP PROCEDURE IF EXISTS spCrearVenta;
-DROP PROCEDURE IF EXISTS spModificarVenta;
-DROP PROCEDURE IF EXISTS spEliminarVenta;
-DROP PROCEDURE IF EXISTS spAgregarProductoAVenta;
-DROP PROCEDURE IF EXISTS spModificarProductoDeUnaVenta;
-DROP PROCEDURE IF EXISTS spEliminarProductoDeUnaVenta;
-DROP PROCEDURE IF EXISTS spModificarStockActual;
 DROP PROCEDURE IF EXISTS spVerFormasPago;
+DROP PROCEDURE IF EXISTS spObtenerProductosDeVenta;
 
 -- CREAR TABLAS
 
@@ -477,4 +469,16 @@ CREATE PROCEDURE `spVerFormasPago`()
 BEGIN
 	SELECT * FROM formas_pago;
 END//
+DELIMITER ;
+
+-- SP Para obtener productos asociados a una venta
+DELIMITER //
+CREATE PROCEDURE spObtenerProductosDeVenta(
+    IN idVenta INT
+)
+BEGIN
+    SELECT id_producto, cantidad
+    FROM ventas_producto
+    WHERE id_venta = idVenta;
+END //
 DELIMITER ;
