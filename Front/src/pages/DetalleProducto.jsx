@@ -25,9 +25,13 @@ function DetalleProducto() {
 
     const getCategorias = async () => {
       try {
-        const resultado = await fetch("http://localhost:3000/categorias");
-        const data = await resultado.json();
+        const respuesta = await fetch("http://localhost:3000/categorias");
+        if (!respuesta.ok) {
+          const errorData = await respuesta.json();
+          throw new Error(`Error ${respuesta.status}: ${errorData.error}`);
+        }
 
+        const data = await respuesta.json();
         setCategorias(data.categorias[0]);
       } catch (error) {
         console.error("Error al obtener las categorias:", error);
@@ -44,7 +48,7 @@ function DetalleProducto() {
   };
 
   const categoriaFiltrada = categorias.find(
-    (categoria) => categoria.id_categoria === id
+    (categoria) => categoria.id_categoria === producto.id_categoria
   );
 
   return (
