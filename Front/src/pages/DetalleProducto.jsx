@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import styles from "../styles/DetalleProducto.module.css";
 import { useNavigate, useParams } from "react-router-dom";
-import obtenerNombreCategoria from "../../utils/filtrarCategoria";
 
 function DetalleProducto() {
   const { id } = useParams();
