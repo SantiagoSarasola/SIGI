@@ -5,7 +5,6 @@ import Paginacion from "../components/Paginacion";
 
 function Productos() {
   const [productos, setProductos] = useState([]);
-  const [productosOriginales, setProductosOriginales] = useState([]);
   const [sort, setSort] = useState("nombre_producto");
   const [order, setOrder] = useState("ASC");
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
