@@ -315,7 +315,7 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE `spVerCategorias`()
 BEGIN
-	SELECT * FROM categorias_producto;
+	SELECT * FROM categorias_producto WHERE inhabilitado = 0;
 END//
 DELIMITER ;
 
