@@ -7,6 +7,7 @@ import routerCategorias from "./inventario/categorias.js";
 import routerUsuarios from "./login/usuarios.js";
 import routerRoles from "./login/roles.js";
 import routerAuth, { authConfig } from "./login/auth.js";
+import routerFormasPago from "./gestionVentas/formasPago.js";
 
 connectDB();
 console.log("Base de Datos conectada");
@@ -24,10 +25,12 @@ authConfig();
 // Conecta la ruta "productos" con el router
 app.use("/productos", routerProductos);
 app.use("/ventas", routerVentas);
+app.use("/ventasProducto", routerVentas);
 app.use("/usuarios", routerUsuarios);
 app.use("/categorias", routerCategorias);
 app.use("/roles", routerRoles);
 app.use("/auth", routerAuth);
+app.use("/pagos", routerFormasPago);
 
 app.listen(PORT, (err) => {
   console.log(

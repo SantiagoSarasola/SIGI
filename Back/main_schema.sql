@@ -25,6 +25,14 @@ DROP PROCEDURE IF EXISTS spCrearVenta;
 DROP PROCEDURE IF EXISTS spModificarVenta;
 DROP PROCEDURE IF EXISTS spEliminarVenta;
 DROP PROCEDURE IF EXISTS spAgregarProductoAVenta;
+DROP PROCEDURE IF EXISTS spEliminarProductoDeUnaVenta;
+DROP PROCEDURE IF EXISTS spModificarStockActual;
+DROP PROCEDURE IF EXISTS spVerVentas;
+DROP PROCEDURE IF EXISTS spVerVentaYProductosPorId;
+DROP PROCEDURE IF EXISTS spCrearVenta;
+DROP PROCEDURE IF EXISTS spModificarVenta;
+DROP PROCEDURE IF EXISTS spEliminarVenta;
+DROP PROCEDURE IF EXISTS spAgregarProductoAVenta;
 DROP PROCEDURE IF EXISTS spModificarProductoDeUnaVenta;
 DROP PROCEDURE IF EXISTS spEliminarProductoDeUnaVenta;
 DROP PROCEDURE IF EXISTS spModificarStockActual;
@@ -106,7 +114,7 @@ CREATE TABLE `ventas_producto` (
   KEY `id_venta` (`id_venta`),
   KEY `id_producto` (`id_producto`),
   CONSTRAINT `id_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`),
-  CONSTRAINT `id_venta` FOREIGN KEY (`id_venta`) REFERENCES `ventas` (`id_venta`)
+  CONSTRAINT `id_venta` FOREIGN KEY (`id_venta`) REFERENCES `ventas` (`id_venta`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- CARGAR DATOS DE PRUEBA
@@ -387,8 +395,6 @@ BEGIN
     INSERT INTO ventas (venta_total, cantidad_total, id_forma_pago, fecha)
     VALUES (ventaTotal, cantidadTotal, formaPago, CURRENT_TIMESTAMP());
     SELECT LAST_INSERT_ID() AS id_venta;
-    
-    CALL spModificarStockActual(idProducto, cantidad);
 END //
 DELIMITER ;
 
@@ -428,43 +434,10 @@ BEGIN
     INSERT INTO ventas_producto (id_venta, id_producto, cantidad, venta_subtotal)
     VALUES (idVenta, idProducto, cantidad, ventaSubTotal);
 
+    SELECT LAST_INSERT_ID() AS id_venta_producto;
+
     CALL spModificarStockActual(idProducto, cantidad);
 
-END //
-DELIMITER ;
-
-DELIMITER //
-CREATE PROCEDURE spModificarProductoDeUnaVenta(
-    IN idVentaProducto INT,
-    IN idProducto INT,
-    IN cantidad INT,
-    IN ventaSubTotal DECIMAL(10, 2)
-)
-BEGIN
-    -- Variables para chequear si se reemplaza a un producto viejo por uno nuevo
-    DECLARE idProductoAnterior INT;
-    DECLARE cantidadAnterior INT;
-    DECLARE diferenciaCantidad INT;
-
-     -- Obtencion de los valores anteriores a la modificacion: Id_producto y cantidad
-    SELECT id_producto, cantidad
-    INTO idProductoAnterior, cantidadAnterior
-    FROM ventas_producto
-    WHERE id_venta_producto = idVentaProducto;
-
-    -- Actualizacion de venta_producto
-    UPDATE ventas_producto
-    SET id_producto = idProducto, cantidad = cantidad, venta_subtotal = ventaSubTotal
-    WHERE id_venta_producto = idVentaProducto;
-
-    -- Validar si se reemplaza a un producto viejo por uno nuevo y hacer las actualizaciones de stock
-    IF idProductoAnterior != idProducto THEN
-        CALL spModificarStockActual(idProductoAnterior, cantidadAnterior * (-1));
-        CALL spModificarStockActual(idProducto, cantidad);
-    ELSE 
-        SET diferenciaCantidad = cantidad - cantidadAnterior;
-        CALL spModificarStockActual(idProducto, diferenciaCantidad * (-1));
-    END IF;
 END //
 DELIMITER ;
 
@@ -476,8 +449,7 @@ CREATE PROCEDURE spEliminarProductoDeUnaVenta(
     IN cantidad INT
 )
 BEGIN
-    UPDATE ventas_producto
-    SET inhabilitada = TRUE
+    DELETE FROM ventas_producto
     WHERE id_venta_producto = idVentaProducto;
     
     CALL spModificarStockActual(idProducto, cantidad * (-1));
@@ -495,5 +467,13 @@ BEGIN
 		UPDATE productos
         SET stock_actual = stock_actual - cantidadADescontar
         WHERE id_producto = idProducto;
+END//
+DELIMITER ;
+
+-- SP FORMAS PAGO
+DELIMITER //
+CREATE PROCEDURE `spVerFormasPago`()
+BEGIN
+	SELECT * FROM formas_pago;
 END//
 DELIMITER ;

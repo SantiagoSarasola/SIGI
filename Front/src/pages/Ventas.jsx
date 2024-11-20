@@ -5,13 +5,12 @@ import React from "react";
 import "../styles/Ventas.css";
 
 function Ventas() {
-  const [ventas, setVentas] = useState([]); 
-  const [totalVentas, setTotalVentas] = useState(0); 
+  const [ventas, setVentas] = useState([]);
+  const [totalVentas, setTotalVentas] = useState(0);
   const [paginaActual, setPaginaActual] = useState(1);
   const [limite, setLimite] = useState(10);
 
   const navigate = useNavigate();
-
 
   useEffect(() => {
     const traerVentas = async () => {
@@ -41,7 +40,7 @@ function Ventas() {
   }, [paginaActual, limite]);
 
   const handleAgregar = () => {
-    navigate("/agregar_venta");
+    navigate("/agregarProductoventas");
   };
 
   const handleVerDetalles = (id) => {
@@ -49,20 +48,24 @@ function Ventas() {
   };
 
   const handleBorrar = async (id) => {
-    const confirmacion = window.confirm(`¿Estás seguro de eliminar la venta con ID ${id}?`);
+    const confirmacion = window.confirm(
+      `¿Estás seguro de eliminar la venta con ID ${id}?`
+    );
     if (!confirmacion) return;
-  
+
     try {
       const respuesta = await fetch(`http://localhost:3000/ventas/${id}`, {
         method: "DELETE",
       });
-  
+
       if (!respuesta.ok) {
         const errorData = await respuesta.json();
         throw new Error(`Error ${respuesta.status}: ${errorData.error}`);
       }
-  
-      setVentas((prevVentas) => prevVentas.filter((venta) => venta.id_venta !== id));
+
+      setVentas((prevVentas) =>
+        prevVentas.filter((venta) => venta.id_venta !== id)
+      );
       alert("Venta eliminada correctamente.");
     } catch (error) {
       console.error("Error al eliminar la venta:", error);
@@ -136,11 +139,9 @@ function Ventas() {
           )}
         </tbody>
       </table>
-     
+
       <div className="total-ventas">
-        <h3>
-          Total de Ventas: ${sumaTotalVentas.toFixed(2)}
-        </h3>
+        <h3>Total de Ventas: ${sumaTotalVentas.toFixed(2)}</h3>
       </div>
     </div>
   );
