@@ -72,7 +72,7 @@ router.put(
   async (req, res) => {
     const validacion = validationResult(req);
     if (!validacion.isEmpty()) {
-      res.status(400).send({ errores: validacion.array() });
+      res.status(400).send({ errores: validacion.mapped() });
       return;
     }
 
@@ -127,7 +127,7 @@ router.put(
 router.post("/", validarAtributosProducto("POST"), async (req, res) => {
   const validacion = validationResult(req);
   if (!validacion.isEmpty()) {
-    res.status(400).send({ errores: validacion.array() });
+    res.status(400).send({ errores: validacion.mapped() });
     return;
   }
 

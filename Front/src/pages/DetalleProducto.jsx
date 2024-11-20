@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import styles from '../styles/DetalleProducto.module.css';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import styles from "../styles/DetalleProducto.module.css";
+import { useNavigate, useParams } from "react-router-dom";
 
 function DetalleProducto() {
-  const [producto, setProducto] = useState(null);
-  const { id } = useParams(); 
+  const { id } = useParams();
   const navigate = useNavigate();
+  const [producto, setProducto] = useState(null);
+  const [categorias, setCategorias] = useState([]);
 
   useEffect(() => {
     const getProducto = async () => {
@@ -22,12 +23,33 @@ function DetalleProducto() {
       }
     };
 
+    const getCategorias = async () => {
+      try {
+        const respuesta = await fetch("http://localhost:3000/categorias");
+        if (!respuesta.ok) {
+          const errorData = await respuesta.json();
+          throw new Error(`Error ${respuesta.status}: ${errorData.error}`);
+        }
+
+        const data = await respuesta.json();
+        setCategorias(data.categorias[0]);
+      } catch (error) {
+        console.error("Error al obtener las categorias:", error);
+        alert("No se pudo obtener las categorias");
+      }
+    };
+
     getProducto();
-  }, [id]); 
+    getCategorias();
+  }, [id]);
 
   const handleEdit = () => {
     navigate(`/productos/${id}/editar`);
   };
+
+  const categoriaFiltrada = categorias.find(
+    (categoria) => categoria.id_categoria === producto.id_categoria
+  );
 
   return (
     <div className={styles.pageContainer}>
@@ -68,10 +90,22 @@ function DetalleProducto() {
           </div>
           <div className={styles.viewGroup}>
             <label>Categoría:</label>
-            <div>{producto.categoria}</div>
+            <div>
+              {categorias && categoriaFiltrada && categoriaFiltrada.descripcion}
+            </div>
           </div>
-          <button onClick={()=>navigate(`/productos`)} className={`${styles.button} ${styles.cancelButton}`}>Cancelar</button>
-          <button className={`${styles.button} ${styles.saveButton}`} onClick={handleEdit}>Editar</button>
+          <button
+            onClick={() => navigate(-1)}
+            className={`${styles.button} ${styles.cancelButton}`}
+          >
+            Cancelar
+          </button>
+          <button
+            className={`${styles.button} ${styles.saveButton}`}
+            onClick={handleEdit}
+          >
+            Editar
+          </button>
         </>
       ) : (
         <p>Cargando...</p>
