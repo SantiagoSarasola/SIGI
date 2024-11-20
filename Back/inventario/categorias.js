@@ -24,7 +24,7 @@ router.put("/:id", validarId(), validarAtributosCategoria, async (req, res) =>{
 
     const validacion = validationResult(req);
     if (!validacion.isEmpty()) {
-      res.status(400).send({ errores: validacion.array() });
+      res.status(400).send({ errores: validacion.mapped() });
       return;
     }
     try {
@@ -45,7 +45,7 @@ router.put("/:id", validarId(), validarAtributosCategoria, async (req, res) =>{
 router.post("/", validarAtributosCategoria, async (req, res) =>{
     const validacion = validationResult(req);
     if (!validacion.isEmpty()) {
-        res.status(400).send({ errores: validacion.array() });
+        res.status(400).send({ errores: validacion.mapped() });
         return;
     }
     
