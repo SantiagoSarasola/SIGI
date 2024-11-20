@@ -36,6 +36,7 @@ DROP PROCEDURE IF EXISTS spAgregarProductoAVenta;
 DROP PROCEDURE IF EXISTS spModificarProductoDeUnaVenta;
 DROP PROCEDURE IF EXISTS spEliminarProductoDeUnaVenta;
 DROP PROCEDURE IF EXISTS spModificarStockActual;
+DROP PROCEDURE IF EXISTS spVerFormasPago;
 
 -- CREAR TABLAS
 
