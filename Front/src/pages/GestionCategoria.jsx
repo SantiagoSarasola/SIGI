@@ -8,6 +8,7 @@ const GestionCategorias = () => {
   const [categorias, setCategorias] = useState([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
   const [modoEdicion, setModoEdicion] = useState(false);
+  const [error,setError] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,6 +31,9 @@ const GestionCategorias = () => {
     if (response.ok) {
       const nueva = await response.json();
       setCategorias([...categorias, nueva.categoria]);
+    }else {
+      const {errores} = await response.json()
+      setError(errores)
     }
   };
 
@@ -64,8 +68,9 @@ const GestionCategorias = () => {
   return (
     <div className={styles.gestionCategorias}>
       <h2>Gestión de Categorías</h2>
-      <FormCategoria
-        onSave={(descripcion) => {
+      <FormCategoria 
+        errores = {error}
+        onGuardar={(descripcion) => {
           modoEdicion
             ? editarCategoria(categoriaSeleccionada.id_categoria, descripcion)
             : agregarCategoria(descripcion);
