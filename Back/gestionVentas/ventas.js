@@ -129,9 +129,19 @@ router.delete("/:id", validarId(), async (req, res) => {
 
   const id = Number(req.params.id);
 
+  const sqlObtenerProductosDeVenta = "CALL spObtenerProductosDeVenta(?)";
   const sql = "CALL spEliminarVenta(?)";
+  const sqlModificarStockActual = "CALL spModificarStockActual(?, ?)";
 
   try {
+
+    const [productos] = await db.execute(sqlObtenerProductosDeVenta, [id]);
+    for(const producto of productos[0]){
+      const idProducto = producto.id_producto;
+      const cantidad = producto.cantidad;
+      await db.execute(sqlModificarStockActual, [idProducto, -cantidad]);
+    }
+
     await db.execute(sql, [id]);
     return res.status(200).send({ id });
   } catch (error) {
