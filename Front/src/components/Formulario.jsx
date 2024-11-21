@@ -15,7 +15,7 @@ const Formulario = ({ producto, onGuardar, onCancelar }) => {
     id_categoria: producto?.id_categoria || 0,
     modificadoPor: 13,
   });
-  const [categorias, setCategorias] = useState([]);
+  const [categoriasFiltradas, setCategoriasFiltradas] = useState([]);
   const [precioSugerido, setPrecioSugerido] = useState(0);
   const [error, setError] = useState({});
   const navigate = useNavigate();
@@ -25,8 +25,28 @@ const Formulario = ({ producto, onGuardar, onCancelar }) => {
       const response = await fetch("http://localhost:3000/categorias");
       if (response.ok) {
         const result = await response.json();
-        const categorias = result.categorias[0];
-        setCategorias(categorias);
+
+        const categoriasHabilitadas = result.categorias[0].filter(
+          (cat) => cat.inhabilitado === 0
+        );
+
+        if (data.id_producto !== 0) {
+          const categoriaActual = result.categorias[0].find(
+            (cat) => cat.id_categoria === data.id_categoria
+          );
+
+          const categoriaActualExiste = categoriasHabilitadas.some(
+            (cat) => cat.id_categoria === categoriaActual.id_categoria
+          );
+
+          if (!categoriaActualExiste) {
+            setCategoriasFiltradas([...categoriasHabilitadas, categoriaActual]);
+          } else {
+            setCategoriasFiltradas(categoriasHabilitadas);
+          }
+        } else {
+          setCategoriasFiltradas(categoriasHabilitadas);
+        }
       }
     };
     getCategorias();
@@ -224,7 +244,7 @@ const Formulario = ({ producto, onGuardar, onCancelar }) => {
           onChange={elegirCategoria}
         >
           <option value="0">Selecciona una categoría</option>
-          {categorias.map((cat) => (
+          {categoriasFiltradas.map((cat) => (
             <option key={cat.id_categoria} value={cat.id_categoria}>
               {cat.descripcion}
             </option>
