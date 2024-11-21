@@ -29,9 +29,12 @@ const EditarProducto = () => {
   const handleGuardar = (productoActualizado) => {
     if(window.confirm("Esta seguro que desea editar este producto?")){
       alert("Producto actualizado")
+      console.log("Producto actualizado:", productoActualizado);
+      navigate(`/Productos`);
+    }else{
+      alert("Se cancelo la operacion!");
     }
-    console.log("Producto actualizado:", productoActualizado);
-    navigate(`/Productos`);
+    
   };
 
   const handleCancelar = () => {
