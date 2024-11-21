@@ -74,15 +74,15 @@ function DetalleProducto() {
           </div>
           <div className={styles.viewGroup}>
             <label>Descuento 1:</label>
-            <div>${producto.descuento_uno}</div>
+            <div>{producto.descuento_uno}%</div>
           </div>
           <div className={styles.viewGroup}>
             <label>Descuento 2:</label>
-            <div>${producto.descuento_dos}</div>
+            <div>{producto.descuento_dos}%</div>
           </div>
           <div className={styles.viewGroup}>
             <label>Incremento:</label>
-            <div>${producto.incremento}</div>
+            <div>{producto.incremento}%</div>
           </div>
           <div className={styles.viewGroup}>
             <label>Precio Final:</label>
