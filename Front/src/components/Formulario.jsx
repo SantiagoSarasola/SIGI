@@ -205,15 +205,6 @@ const Formulario = ({ producto, onGuardar, onCancelar }) => {
         />
       </div>
       <div className={styles.formGroup}>
-        <label>Precio Sugerido</label>
-        <input
-          type="number"
-          name="precio_sugerido"
-          value={precioSugerido}
-          readOnly
-        />
-      </div>
-      <div className={styles.formGroup}>
         <label>Precio Final</label>
         <input
           type="number"
@@ -232,10 +223,6 @@ const Formulario = ({ producto, onGuardar, onCancelar }) => {
           value={data.id_categoria}
           onChange={elegirCategoria}
         >
-          <option value="" disabled>
-            Selecciona una categoría
-          </option>
-        <select name="idCategoria" value={data.id_categoria} onChange={elegirCategoria}>
           <option value="0">Selecciona una categoría</option>
           {categorias.map((cat) => (
             <option key={cat.id_categoria} value={cat.id_categoria}>
@@ -251,10 +238,9 @@ const Formulario = ({ producto, onGuardar, onCancelar }) => {
       <div className={styles.buttonGroup}>
         <button
           type="button"
-          onClick={onCancel}
+          onClick={onCancelar}
           className={`${styles.button} ${styles.cancelButton}`}
         >
-        <button type="button" onClick={onCancelar} className={`${styles.button} ${styles.cancelButton}`}>
           Cancelar
         </button>
         <button
