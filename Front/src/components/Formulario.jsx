@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/Formulario.module.css";
 
-const Formulario = ({ producto, onSave, onCancel }) => {
+const Formulario = ({ producto, onGuardar, onCancelar }) => {
   const [data, setData] = useState({
     id_producto: producto?.id_producto || 0,
     nombre_producto: producto?.nombre_producto || "",
@@ -17,6 +17,7 @@ const Formulario = ({ producto, onSave, onCancel }) => {
   });
   const [categorias, setCategorias] = useState([]);
   const [precioSugerido, setPrecioSugerido] = useState(0);
+  const [error, setError] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -75,7 +76,7 @@ const Formulario = ({ producto, onSave, onCancel }) => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleCargar = async (e) => {
     e.preventDefault();
     const method = data.id_producto === 0 ? "POST" : "PUT";
     const url =
@@ -102,8 +103,10 @@ const Formulario = ({ producto, onSave, onCancel }) => {
 
       if (response.ok) {
         const { producto } = await response.json();
-        onSave(producto);
+        onGuardar(producto);
       } else {
+        const { errores } = await response.json();
+        setError(errores);
         console.error("Error al guardar el producto:", response.status);
       }
     } catch (error) {
@@ -112,11 +115,11 @@ const Formulario = ({ producto, onSave, onCancel }) => {
   };
 
   return (
-    <form className={styles.formContainer} onSubmit={handleSubmit}>
+    <form className={styles.formContainer} onSubmit={handleCargar}>
       {data.id_producto > 0 && (
         <div className={styles.formGroup}>
           <label>ID Producto</label>
-          <input type="text" value={data.id_producto} readOnly />
+          <p>{data.id_producto}</p>
         </div>
       )}
 
@@ -128,6 +131,9 @@ const Formulario = ({ producto, onSave, onCancel }) => {
           value={data.nombre_producto}
           onChange={handleChange}
         />
+        {error.nombreProducto && (
+          <div style={{ color: "red" }}>{error.nombreProducto.msg}</div>
+        )}
       </div>
       <div className={styles.formGroup}>
         <label>Stock</label>
@@ -137,6 +143,9 @@ const Formulario = ({ producto, onSave, onCancel }) => {
           value={data.stock_actual}
           onChange={handleChange}
         />
+        {error.stockActual && (
+          <div style={{ color: "red" }}>{error.stockActual.msg}</div>
+        )}
       </div>
       <div className={styles.formGroup}>
         <label>Precio Lista</label>
@@ -146,6 +155,9 @@ const Formulario = ({ producto, onSave, onCancel }) => {
           value={data.precio_lista}
           onChange={handleChange}
         />
+        {error.precioLista && (
+          <div style={{ color: "red" }}>{error.precioLista.msg}</div>
+        )}
       </div>
       <div className={styles.formGroup}>
         <label>Descuento uno</label>
@@ -155,6 +167,9 @@ const Formulario = ({ producto, onSave, onCancel }) => {
           value={data.descuento_uno}
           onChange={handleChange}
         />
+        {error.descuentoUno && (
+          <div style={{ color: "red" }}>{error.descuentoUno.msg}</div>
+        )}
       </div>
       <div className={styles.formGroup}>
         <label>Descuento dos</label>
@@ -164,6 +179,9 @@ const Formulario = ({ producto, onSave, onCancel }) => {
           value={data.descuento_dos}
           onChange={handleChange}
         />
+        {error.descuentoDos && (
+          <div style={{ color: "red" }}>{error.descuentoDos.msg}</div>
+        )}
       </div>
       <div className={styles.formGroup}>
         <label>Incremento</label>
@@ -172,6 +190,18 @@ const Formulario = ({ producto, onSave, onCancel }) => {
           name="incremento"
           value={data.incremento}
           onChange={handleChange}
+        />
+        {error.incremento && (
+          <div style={{ color: "red" }}>{error.incremento.msg}</div>
+        )}
+      </div>
+      <div className={styles.formGroup}>
+        <label>Precio Sugerido</label>
+        <input
+          type="number"
+          name="precio_sugerido"
+          value={precioSugerido}
+          readOnly
         />
       </div>
       <div className={styles.formGroup}>
@@ -191,6 +221,9 @@ const Formulario = ({ producto, onSave, onCancel }) => {
           value={data.precio_final}
           onChange={handleChange}
         />
+        {error.precioFinal && (
+          <div style={{ color: "red" }}>{error.precioFinal.msg}</div>
+        )}
       </div>
       <div className={styles.formGroup}>
         <label>Categoría</label>
@@ -202,6 +235,8 @@ const Formulario = ({ producto, onSave, onCancel }) => {
           <option value="" disabled>
             Selecciona una categoría
           </option>
+        <select name="idCategoria" value={data.id_categoria} onChange={elegirCategoria}>
+          <option value="0">Selecciona una categoría</option>
           {categorias.map((cat) => (
             <option key={cat.id_categoria} value={cat.id_categoria}>
               {cat.descripcion}
@@ -209,6 +244,9 @@ const Formulario = ({ producto, onSave, onCancel }) => {
           ))}
           <option value={-1}>Agregar nueva categoría</option>
         </select>
+        {error.idCategoria && (
+          <div style={{ color: "red" }}>{error.idCategoria.msg}</div>
+        )}
       </div>
       <div className={styles.buttonGroup}>
         <button
@@ -216,6 +254,7 @@ const Formulario = ({ producto, onSave, onCancel }) => {
           onClick={onCancel}
           className={`${styles.button} ${styles.cancelButton}`}
         >
+        <button type="button" onClick={onCancelar} className={`${styles.button} ${styles.cancelButton}`}>
           Cancelar
         </button>
         <button
