@@ -1,4 +1,3 @@
-// GestionCategorias.js
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FormCategoria from "../components/FormCategoria";
@@ -85,19 +84,20 @@ const GestionCategorias = () => {
           setCategoriaSeleccionada(null);
         }}
       />
-      <ul>
+      <ul className={styles.formContainer}>
         {categorias.map((cat) => (
-          <li key={cat.id_categoria}>
+          <li key={cat.id_categoria} className={styles.formGroup}>
             {cat.descripcion}
             <button
               onClick={() => {
                 setCategoriaSeleccionada(cat);
                 setModoEdicion(true);
               }}
+              className={styles.saveButton}
             >
               Editar
             </button>
-            <button onClick={() => eliminarCategoria(cat.id_categoria)}>
+            <button onClick={() => eliminarCategoria(cat.id_categoria)} className={styles.cancelButton}>
               Eliminar
             </button>
           </li>
