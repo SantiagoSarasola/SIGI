@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import styles from "../styles/Formulario.module.css";
 
 const Formulario = ({ producto, onSave, onCancel }) => {
   const [data, setData] = useState({
     id_producto: producto?.id_producto || 0,
-    nombre_producto: producto?.nombre_producto || '',
+    nombre_producto: producto?.nombre_producto || "",
     stock_actual: producto?.stock_actual || 0,
     precio_lista: producto?.precio_lista || 0,
     descuento_uno: producto?.descuento_uno || 0,
@@ -13,10 +13,11 @@ const Formulario = ({ producto, onSave, onCancel }) => {
     incremento: producto?.incremento || 0,
     precio_final: producto?.precio_final || 0,
     id_categoria: producto?.id_categoria || 0,
-    modificadoPor: 13
+    modificadoPor: 13,
   });
   const [categorias, setCategorias] = useState([]);
-  const navigate = useNavigate(); 
+  const [precioSugerido, setPrecioSugerido] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getCategorias = async () => {
@@ -30,6 +31,36 @@ const Formulario = ({ producto, onSave, onCancel }) => {
     getCategorias();
   }, []);
 
+  useEffect(() => {
+    const calcularPrecioSugerido = () => {
+      const { precio_lista, descuento_uno, descuento_dos, incremento } = data;
+      if (
+        !isNaN(precio_lista) &&
+        !isNaN(descuento_uno) &&
+        !isNaN(descuento_dos) &&
+        !isNaN(incremento) &&
+        precio_lista > 0
+      ) {
+        const primerDescuento =
+          precio_lista - precio_lista * (descuento_uno / 100);
+        const segundoDescuento =
+          primerDescuento - primerDescuento * (descuento_dos / 100);
+        const montoConIncremento =
+          segundoDescuento + segundoDescuento * (incremento / 100);
+        setPrecioSugerido(montoConIncremento);
+      } else {
+        setPrecioSugerido(0);
+      }
+    };
+
+    calcularPrecioSugerido();
+  }, [
+    data.precio_lista,
+    data.descuento_uno,
+    data.descuento_dos,
+    data.incremento,
+  ]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
@@ -38,7 +69,7 @@ const Formulario = ({ producto, onSave, onCancel }) => {
   const elegirCategoria = (e) => {
     const idActual = parseInt(e.target.value);
     if (idActual === -1) {
-      navigate("/productos/categorias"); 
+      navigate("/productos/categorias");
     } else {
       setData({ ...data, id_categoria: idActual });
     }
@@ -47,8 +78,11 @@ const Formulario = ({ producto, onSave, onCancel }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = data.id_producto === 0 ? "POST" : "PUT";
-    const url = data.id_producto === 0 ? `http://localhost:3000/productos` : `http://localhost:3000/productos/${data.id_producto}`;
-    
+    const url =
+      data.id_producto === 0
+        ? `http://localhost:3000/productos`
+        : `http://localhost:3000/productos/${data.id_producto}`;
+
     try {
       const response = await fetch(url, {
         method,
@@ -65,7 +99,7 @@ const Formulario = ({ producto, onSave, onCancel }) => {
           modificadoPor: 13,
         }),
       });
-      
+
       if (response.ok) {
         const { producto } = await response.json();
         onSave(producto);
@@ -141,6 +175,15 @@ const Formulario = ({ producto, onSave, onCancel }) => {
         />
       </div>
       <div className={styles.formGroup}>
+        <label>Precio Sugerido</label>
+        <input
+          type="number"
+          name="precio_sugerido"
+          value={precioSugerido}
+          readOnly
+        />
+      </div>
+      <div className={styles.formGroup}>
         <label>Precio Final</label>
         <input
           type="number"
@@ -151,8 +194,14 @@ const Formulario = ({ producto, onSave, onCancel }) => {
       </div>
       <div className={styles.formGroup}>
         <label>Categoría</label>
-        <select name="idCategoria" value={data.id_categoria} onChange={elegirCategoria}>
-          <option value="" disabled>Selecciona una categoría</option>
+        <select
+          name="idCategoria"
+          value={data.id_categoria}
+          onChange={elegirCategoria}
+        >
+          <option value="" disabled>
+            Selecciona una categoría
+          </option>
           {categorias.map((cat) => (
             <option key={cat.id_categoria} value={cat.id_categoria}>
               {cat.descripcion}
@@ -162,10 +211,17 @@ const Formulario = ({ producto, onSave, onCancel }) => {
         </select>
       </div>
       <div className={styles.buttonGroup}>
-        <button type="button" onClick={onCancel} className={`${styles.button} ${styles.cancelButton}`}>
+        <button
+          type="button"
+          onClick={onCancel}
+          className={`${styles.button} ${styles.cancelButton}`}
+        >
           Cancelar
         </button>
-        <button type="submit" className={`${styles.button} ${styles.saveButton}`}>
+        <button
+          type="submit"
+          className={`${styles.button} ${styles.saveButton}`}
+        >
           {data.id_producto === 0 ? "Guardar y Cerrar" : "Editar y Cerrar"}
         </button>
       </div>
@@ -174,4 +230,3 @@ const Formulario = ({ producto, onSave, onCancel }) => {
 };
 
 export default Formulario;
-
