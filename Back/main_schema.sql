@@ -14,6 +14,7 @@ DROP PROCEDURE IF EXISTS spNuevoProducto;
 DROP PROCEDURE IF EXISTS spEliminarProducto;
 DROP PROCEDURE IF EXISTS spVerUsuarios;
 DROP PROCEDURE IF EXISTS spNuevoUsuario;
+DROP PROCEDURE IF EXISTS spModificarUsuario;
 DROP PROCEDURE IF EXISTS spEliminarUsuario;
 DROP PROCEDURE IF EXISTS spVerCategorias;
 DROP PROCEDURE IF EXISTS spNuevaCategoria;
@@ -295,6 +296,20 @@ CREATE PROCEDURE spNuevoUsuario(
 BEGIN
     INSERT INTO usuarios (email, password, id_rol)
     VALUES (email, password, idRol);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE spModificarUsuario(
+    IN email VARCHAR(50),
+    IN password VARCHAR(60),
+    IN idRol INT,
+    IN idUsuario INT
+)
+BEGIN
+    UPDATE usuarios
+        SET email = email, password = password, id_rol = idRol
+    WHERE id_usuario = idUsuario;
 END //
 DELIMITER ;
 
