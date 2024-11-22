@@ -47,8 +47,6 @@ router.delete(
   validarPermisosUsuario(["Administrador"]),
   validarId(),
   async (req, res) => {
-    console.log("res ", res);
-
     const validacion = validationResult(req);
     if (!validacion.isEmpty()) {
       res.status(400).send({ errores: validacion.array() });

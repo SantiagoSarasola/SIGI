@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FormCategoria from "../components/FormCategoria";
 import styles from "../styles/GestionCategoria.module.css";
+import { useAuth } from "../auth/authContext";
 
 const GestionCategorias = () => {
   const [categorias, setCategorias] = useState([]);
@@ -10,6 +11,7 @@ const GestionCategorias = () => {
   const [modoEdicion, setModoEdicion] = useState(false);
   const [error, setError] = useState({});
   const navigate = useNavigate();
+  const { sesion } = useAuth();
 
   useEffect(() => {
     const fetchCategorias = async () => {
@@ -28,7 +30,10 @@ const GestionCategorias = () => {
   const agregarCategoria = async (nuevaCategoria) => {
     const response = await fetch("http://localhost:3000/categorias", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sesion.token}`,
+      },
       body: JSON.stringify({ descripcion: nuevaCategoria }),
     });
     if (response.ok) {
@@ -43,7 +48,10 @@ const GestionCategorias = () => {
   const editarCategoria = async (id, descripcion) => {
     const response = await fetch(`http://localhost:3000/categorias/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sesion.token}`,
+      },
       body: JSON.stringify({ descripcion }),
     });
     if (response.ok) {
@@ -61,6 +69,9 @@ const GestionCategorias = () => {
     if (window.confirm("¿Estás seguro de eliminar esta categoría?")) {
       const response = await fetch(`http://localhost:3000/categorias/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${sesion.token}`,
+        },
       });
       if (response.ok) {
         setCategorias(categorias.filter((cat) => cat.id_categoria !== id));
